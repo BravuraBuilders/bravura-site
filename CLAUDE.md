@@ -35,10 +35,16 @@ glass doors into the house — the "arrival".
   intro is hidden and the walkthrough IS the top section (first scroll scrubs immediately);
   the image is cover-cropped into the **bottom half** of the screen (`MOBILE_BAND = 0.5`,
   moderate side crop, centre kept) with the caption in the top half and dots along the
-  bottom. The first room's caption is visible from scroll 0. The space above the image is a
-  gradient from the theme navy down to the image's **own top-edge pixel, sampled live** in
-  `render()` (gradient overlaps the join 1px), so the seam is 100% seamless at every scroll
-  position and reads as the sky/ceiling continuing upward. (`rooms[].top` is now unused.)
+  bottom. The first room's caption is visible from scroll 0. The `.journey-pin` is `100dvh`
+  and the canvas fills it (`width/height:100%`, no manual px), so it tracks the viewport as the
+  mobile URL bar hides/shows — no dark strip. The space above the image is a gradient from the
+  theme navy down to the image's top-edge colour, sampled live in `render()` (join overlapped
+  1px), so interior rooms read as the ceiling continuing up, seamlessly. **The exterior is a
+  special case:** its top-edge colour changes wildly as the camera flies from sky into the
+  house, so instead it holds a CONSTANT sky colour (`skyTop`, captured once at the start) and
+  dissolves that gradient softly into the image over a short transparent overlap — no colour
+  drift, no hard seam — easing to the live colour + a hard join only as the kitchen
+  cross-dissolves in. (`rooms[].top` is unused.)
 - **Seams (mirror bookends):** the intro blends from dark down to the exterior's **sky**
   (`#dcedfa`) at the top. The bottom mirrors it: the last frame stays crisp (no overlay) and
   the `.closing` wrapper (manifesto + contact) is a gradient starting at the **bedroom floor

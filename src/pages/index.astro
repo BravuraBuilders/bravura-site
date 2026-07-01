@@ -298,7 +298,9 @@ const pad = (n: number) => String(n).padStart(4, '0');
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       vw = window.innerWidth; vh = window.innerHeight;
       canvas.width = Math.round(vw * dpr); canvas.height = Math.round(vh * dpr);
-      canvas.style.width = vw + 'px'; canvas.style.height = vh + 'px';
+      // Let CSS size the canvas to fill the pin (100dvh) so it tracks the viewport as the
+      // mobile URL bar hides/shows — no dark strip, no manual pixel sizing to fight it.
+      canvas.style.width = '100%'; canvas.style.height = '100%';
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium';
       // portrait: image band is anchored to the bottom; publish its height so the
       // caption can sit directly above it (no floating empty bands).
@@ -308,9 +310,6 @@ const pad = (n: number) => String(n).padStart(4, '0');
         root.style.setProperty('--band-h', (vh * MOBILE_BAND) + 'px');
       } else {
         root.classList.remove('is-portrait');
-        // desktop covers the whole viewport — drop any floor tint left over from portrait
-        root.style.backgroundColor = '';
-        if (journey) journey.style.backgroundColor = '';
       }
       needsDraw = true;
     }
@@ -349,6 +348,7 @@ const pad = (n: number) => String(n).padStart(4, '0');
     }
 
     let cur = 0, prevCur = 0, running = false, needsDraw = true, lastSig = '', lastT = 0;
+    let skyTop = null; // captured once: the exterior's opening sky colour, held constant (mobile gradient)
 
     function render() {
       const maxRoom = N_ROOMS - 1;
@@ -404,24 +404,35 @@ const pad = (n: number) => String(n).padStart(4, '0');
       // theme navy down to the image's own top-edge colour — so the space reads as
       // sky/ceiling and shifts to match whichever room is on screen.
       if (portrait) {
-        // Fill the area above the band with a gradient from the theme navy down to
-        // the image's OWN top-edge colour, sampled live so the join is 100% seamless.
-        // The gradient overlaps 1px into the image to eliminate any sub-pixel gap.
+        // Fill the area above the band with a gradient from the theme navy down to the
+        // image's top-edge colour, overlapping the join 1px to kill any sub-pixel gap.
         const bandTop = Math.round(canvas.height * (1 - MOBILE_BAND));
         const s = ctx.getImageData(canvas.width >> 1, Math.min(canvas.height - 1, bandTop + 1), 1, 1).data;
-        const g = ctx.createLinearGradient(0, 0, 0, bandTop + 1);
-        g.addColorStop(0, '#081a28');
-        g.addColorStop(1, `rgb(${s[0]},${s[1]},${s[2]})`);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, bandTop + 1);
-        // The mobile URL bar hides on scroll and the browser fills the freed strip at the
-        // bottom with the ROOT background colour. Paint that (html + journey) with the
-        // image's own bottom-edge pixel (the floor), sampled live, so the strip reads as the
-        // floor continuing instead of a flat dark-blue block — and shifts room to room.
-        const fp = ctx.getImageData(canvas.width >> 1, canvas.height - 2, 1, 1).data;
-        const floorCol = `rgb(${fp[0]},${fp[1]},${fp[2]})`;
-        document.documentElement.style.backgroundColor = floorCol;
-        if (journey) journey.style.backgroundColor = floorCol;
+        if (room === 0) {
+          // The exterior flies from open sky into the house, so its top-edge colour changes
+          // wildly (sky → facade → interior) — a live sample would drift the whole room and a
+          // flat colour would seam against the dark facade. Instead hold a CONSTANT sky
+          // gradient and let it dissolve softly into the image over a short overlap: no colour
+          // drift, no hard line. Ease to the live colour + a hard join only as the kitchen
+          // cross-dissolves in, so it hands off cleanly to the next room.
+          if (skyTop === null && local < 0.1) skyTop = [s[0], s[1], s[2]];
+          const base = skyTop || [s[0], s[1], s[2]];
+          const sky = nextAlpha > 0 ? mix(base, [s[0], s[1], s[2]], nextAlpha) : base;
+          const overlap = Math.round(canvas.height * 0.05 * (1 - nextAlpha)) + 1;
+          const g = ctx.createLinearGradient(0, 0, 0, bandTop + overlap);
+          g.addColorStop(0, '#081a28');
+          g.addColorStop(bandTop / (bandTop + overlap), `rgb(${sky[0]},${sky[1]},${sky[2]})`);
+          g.addColorStop(1, `rgba(${sky[0]},${sky[1]},${sky[2]},0)`);
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, canvas.width, bandTop + overlap);
+        } else {
+          const bot = [s[0], s[1], s[2]]; // interior rooms: live sample, hard join (matches top, seamless)
+          const g = ctx.createLinearGradient(0, 0, 0, bandTop + 1);
+          g.addColorStop(0, '#081a28');
+          g.addColorStop(1, `rgb(${bot[0]},${bot[1]},${bot[2]})`);
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, canvas.width, bandTop + 1);
+        }
       }
       // (The last frame stays crisp; the section below fades up into it — see the
       //  .manifesto top gradient in CSS — so the image is never dissolved to a flat colour.)
@@ -639,7 +650,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
   .journey-inner { position: relative; height: 880vh; } /* 4 rooms × ~220vh */
   .journey-pin {
     position: sticky; top: 0;
-    height: 100svh; width: 100%; overflow: hidden;
+    height: 100svh; height: 100dvh; /* dvh tracks the viewport as the mobile URL bar hides — no dark strip */
+    width: 100%; overflow: hidden;
   }
   .frame-canvas { display: block; width: 100%; height: 100%; background: var(--cine-bg); }
 
