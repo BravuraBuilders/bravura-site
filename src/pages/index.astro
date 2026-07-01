@@ -8,183 +8,177 @@ const smsHref = 'sms:+14705043420';
 const emailHref = `mailto:${email}`;
 const address = '11720 Amber Park Dr, Alpharetta GA 30009';
 
-const services = [
+// Each room = an image sequence extracted from a wide-angle walkthrough; the
+// camera flies INTO the space as the frame index increases, so scrolling down
+// carries you deeper. Frames live in /frames/<desktop|mobile>/<id>/frame_NNNN.jpg.
+// `desktop` = landscape count, `mobile` = portrait count (they can differ).
+// The exterior clip is landscape only and is reused on mobile.
+const rooms = [
   {
-    title: 'Renovations & Remodels',
-    body:
-      'Kitchens, baths, additions, and whole-home renovations executed with the discipline of new construction. Clean job sites, written communication, and a fixed scope you can hold us to.',
+    id: 'exterior',
+    desktop: 241,
+    mobile: 241,
+    exteriorBoth: true,
+    focusX: 0.5, // image x-fraction held at screen center; raise → house shifts left, lower → right
+    top: '#dcedfa', // sky/top-edge colour the mobile gradient fades to for this room
+    kicker: 'The Home',
+    title: 'Built to turn heads.',
+    body: 'From the curb to the backyard — a home designed to be lived in, and impossible to ignore.',
   },
   {
-    title: 'New Construction',
-    body:
-      'Ground-up residential and small-multifamily builds across metro Atlanta. Vetted subcontractors, transparent budgets, and project management that keeps every trade accountable.',
+    id: 'kitchen',
+    desktop: 204,
+    mobile: 192,
+    top: '#827b6a',
+    kicker: 'The Kitchen',
+    title: 'Where family comes together.',
+    body: 'Walls come down and light pours in — the room where meals get made, the day gets shared, and everyone somehow ends up.',
   },
   {
-    title: "Owner's Representation",
-    body:
-      'When another contractor holds the build, we sit on your side of the table. Owner’s rep engagements cover scope review, schedule oversight, draw approvals, and quality control so you’re never negotiating alone with the trades.',
+    id: 'bathroom',
+    desktop: 241,
+    mobile: 170,
+    top: '#94948c',
+    kicker: 'The Bath',
+    title: 'Your everyday retreat.',
+    body: 'Spa-grade materials, exacting tile work, and daylight framed like a view worth waking up to.',
   },
   {
-    title: 'Consulting',
-    body:
-      'Pre-purchase walkthroughs, feasibility studies, second opinions on existing scopes or competing bids. A builder’s perspective on the questions you’re weighing — without committing to a full project.',
-  },
-  {
-    title: 'Design & Rendering',
-    body:
-      'Photoreal 3D renderings and construction-ready plans, sold as a standalone service. Pay a flat design fee and the deliverables — drawings, renderings, and plans — are yours to keep, whether or not you award us the build.',
-    featured: true,
+    id: 'bedroom',
+    desktop: 241,
+    mobile: 241,
+    top: '#837a68',
+    kicker: 'The Bedroom',
+    title: 'Rest, reimagined.',
+    body: 'Calm, considered rooms to end the day — where the details you never notice are the ones done right.',
   },
 ];
 
-const projects = [
-  { label: 'Open-plan kitchen + great room', location: 'Atlanta, GA', image: '/work/kitchen.jpg' },
-  { label: 'Primary bath remodel', location: 'Atlanta, GA', image: '/work/bath.jpg' },
-  { label: 'Laundry room remodel', location: 'Atlanta, GA', image: '/work/laundry.jpg' },
-  { label: 'New construction', location: 'Atlanta, GA', image: '/work/new-construction.jpg' },
-];
+const pad = (n: number) => String(n).padStart(4, '0');
 ---
 
 <Layout>
-  <header class="nav">
-    <div class="wrap nav-inner">
-      <a href="/" class="brand" aria-label="Bravura Builders home">
-        <img src="/bravura-logo.png" alt="Bravura Builders" class="brand-logo" width="342" height="144" />
-      </a>
+  <div id="loader" class="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="wordmark wordmark--lg">
+        <span class="wordmark-name">Bravura</span>
+        <span class="wordmark-sub">Builders</span>
+      </span>
+      <div class="loader-bar"><span id="loaderFill" class="loader-fill"></span></div>
+      <p class="loader-label">Preparing the walkthrough…</p>
     </div>
+  </div>
+
+  <header class="nav">
+    <a href="/" class="brand" aria-label="Bravura Builders home">
+      <span class="wordmark">
+        <span class="wordmark-name">Bravura</span>
+        <span class="wordmark-sub">Builders</span>
+      </span>
+    </a>
   </header>
 
   <main>
-    <section class="hero">
-      <div class="wrap hero-inner">
-        <span class="eyebrow">· Metro Atlanta ·</span>
+    <!-- INTRO -->
+    <section class="intro">
+      <div class="intro-inner">
+        <span class="eyebrow">Bravura Builders · Metro Atlanta</span>
         <h1>
-          <span class="hero-sep" aria-hidden="true"></span> New Construction <span class="hero-sep" aria-hidden="true"></span><br class="hero-break-mobile" /><span class="hero-sep hero-only-mobile" aria-hidden="true"></span> Remodels <span class="hero-sep" aria-hidden="true"></span> Renovations <span class="hero-sep" aria-hidden="true"></span><br />
-          <em>Built with Bravura.</em>
+          Where the everyday<br /><em>becomes extraordinary.</em>
         </h1>
         <p class="lead">
-          Bravura Builders is a general contracting firm delivering high-craft
-          renovations, new construction, and design services across metro Atlanta.
-          We bring the rigor of large-project management to residential and
-          small-multifamily work.
+          Kitchens, baths, and the hardworking rooms in between — reimagined and
+          rebuilt by a general contractor who treats craftsmanship as the whole point.
         </p>
-        <p class="hero-call"><span class="hero-call-inner">Reach Out for a Free Quote</span></p>
-        <div class="cta-row">
-          <a href={phoneHref} class="btn btn-outline">Call</a>
-          <a href={smsHref} class="btn btn-outline">Text</a>
-          <a href={emailHref} class="btn btn-outline">Email us</a>
-        </div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true">
+        <span>Scroll to walk through</span>
+        <span class="scroll-arrow"><span class="scroll-arrow-dot"></span></span>
+        <span class="scroll-chevron"></span>
       </div>
     </section>
 
-    <section class="services" id="services">
-      <div class="wrap">
-        <div class="section-head">
-          <span class="eyebrow">Services</span>
-          <h2>What we do.</h2>
-        </div>
-        <div class="service-grid">
-          {services.map((s) => (
-            <article class={`service-card${s.featured ? ' service-card--featured' : ''}`}>
-              <h3>{s.title}</h3>
-              <p>{s.body}</p>
-              {s.featured && <span class="service-tag">Billed independently</span>}
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
+    <!-- SCROLL JOURNEY (image-sequence scrub) -->
+    <section class="journey" id="journey" aria-label="A walkthrough of four transformed spaces">
+      <div class="journey-inner">
+        <div class="journey-pin">
+          <canvas id="frameCanvas" class="frame-canvas"></canvas>
+          <div class="scrim" aria-hidden="true"></div>
 
-    <section class="about">
-      <div class="wrap about-inner">
-        <span class="eyebrow">About</span>
-        <article class="dict-entry">
-          <header class="dict-head">
-            <h2 class="dict-word">bra<span class="dict-dot">·</span>vu<span class="dict-dot">·</span>ra</h2>
-            <span class="dict-pron">/brəˈv(y)o͝orə/</span>
-          </header>
-          <p class="dict-meta"><em>noun</em> · Italian, 16th century</p>
-          <p class="dict-def">great technical skill and brilliance shown in a performance or activity.</p>
-        </article>
-        <p class="about-pitch">
-          We are defined by bold design, masterful execution, and the skill to turn
-          vision into reality. <strong>Bring Bravura to your next remodel.</strong>
-        </p>
-        <div class="about-copy">
-          <p>
-            Bravura was founded to bring discipline and clear communication to a trade
-            that often lacks both. Every project runs on a written scope, a defined
-            schedule, and a single point of contact — so clients always know what
-            comes next and what it costs.
-          </p>
-          <p>
-            We work on renovations, new builds, and design engagements across metro
-            Atlanta. Most of our jobs come from referrals; we'd rather do fewer
-            projects well than chase volume.
-          </p>
-        </div>
-      </div>
-    </section>
+          <div class="caption-layer" aria-hidden="true">
+            {rooms.map((r, i) => (
+              <div class="caption" data-room={i}>
+                <span class="caption-kicker">{r.kicker}</span>
+                <h2 class="caption-title">{r.title}</h2>
+                <p class="caption-body">{r.body}</p>
+              </div>
+            ))}
+          </div>
 
-    <section class="work" id="work">
-      <div class="wrap">
-        <div class="section-head">
-          <span class="eyebrow">Selected work</span>
-          <h2>Recent and in-progress projects.</h2>
-        </div>
-        <div class="work-grid">
-          {projects.map((p) => (
-            <figure class="work-tile">
-              <img src={p.image} alt={p.label} class="work-image" loading="lazy" decoding="async" />
-              <figcaption>
-                <strong>{p.label}</strong>
-                <span>{p.location}</span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-        <p class="work-note">Representative project styles. Ask us for our active portfolio over a call.</p>
-      </div>
-    </section>
-
-    <section class="contact" id="contact">
-      <div class="wrap contact-inner">
-        <div>
-          <span class="eyebrow">Start a conversation</span>
-          <h2>Tell us about your project.</h2>
-          <p>
-            The fastest way to get a real answer is a phone call. We'll talk through
-            scope, budget, and timeline — and if design or renderings are the right
-            first step, we'll quote that separately before any construction bid.
-            Estimates are always free.
-          </p>
-          <div class="cta-row">
-            <a href={phoneHref} class="btn btn-outline btn-stacked">
-              <span class="btn-action">Call</span>
-              <span class="btn-target">{phone}</span>
-            </a>
-            <a href={smsHref} class="btn btn-outline btn-stacked">
-              <span class="btn-action">Text</span>
-              <span class="btn-target">{phone}</span>
-            </a>
-            <a href={emailHref} class="btn btn-outline btn-stacked">
-              <span class="btn-action">Email us</span>
-              <span class="btn-target">{email}</span>
-            </a>
+          <div class="progress-rail" aria-hidden="true">
+            {rooms.map((r, i) => (
+              <span class="progress-dot" data-room={i} title={r.kicker}></span>
+            ))}
           </div>
         </div>
-        <aside class="contact-card">
-          <dl>
-            <dt>Call or text</dt>
-            <dd><a href={phoneHref}>{phone}</a></dd>
-            <dt>Email</dt>
-            <dd><a href={emailHref}>{email}</a></dd>
-            <dt>Office</dt>
-            <dd>{address}</dd>
-          </dl>
-        </aside>
       </div>
     </section>
+
+    <!-- REDUCED-MOTION / NO-JS STILL FALLBACK -->
+    <section class="stills" aria-label="Selected spaces">
+      {rooms.map((r) => (
+        <figure class="still">
+          <img
+            src={`/frames/desktop/${r.id}/frame_${pad(r.desktop)}.jpg`}
+            alt={`${r.kicker} by Bravura Builders`}
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>
+            <span class="caption-kicker">{r.kicker}</span>
+            <strong>{r.title}</strong>
+            <span>{r.body}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </section>
+
+    <!-- CLOSING: light floor colour at the top (blends into the bedroom's bottom)
+         fading down to the dark theme by the page bottom — the mirror of the sky. -->
+    <div class="closing">
+    <!-- MANIFESTO -->
+    <section class="manifesto">
+      <div class="wrap manifesto-inner">
+        <p class="dict">
+          bra·vu·ra <span>/brəˈvyoo-rə/</span> — <em>noun.</em> great technical skill
+          and brilliance shown in a performance.
+        </p>
+        <p class="manifesto-body">
+          We put that skill into the rooms you actually live in. Every Bravura project
+          runs on a written scope, a defined schedule, and a single point of contact —
+          so you always know what comes next and exactly what it costs.
+        </p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+      <div class="wrap contact-inner">
+        <span class="eyebrow">Start a conversation</span>
+        <h2>Ready to transform your space?</h2>
+        <p>
+          Reach out for a free quote. We'll talk through scope, budget, and timeline —
+          and if design or renderings are the right first step, we'll quote that
+          separately before any construction bid.
+        </p>
+        <div class="cta-row">
+          <a href={phoneHref} class="glass-btn">Call</a>
+          <a href={smsHref} class="glass-btn">Text</a>
+          <a href={emailHref} class="glass-btn">Email us</a>
+        </div>
+      </div>
+    </section>
+    </div>
   </main>
 
   <footer class="foot">
@@ -195,435 +189,615 @@ const projects = [
   </footer>
 </Layout>
 
+<script id="rooms-data" type="application/json" is:inline set:html={JSON.stringify(rooms)}></script>
+
+<script>
+  import Lenis from 'lenis';
+  const ROOMS = JSON.parse(document.getElementById('rooms-data').textContent);
+  const N_ROOMS = ROOMS.length;
+  const pad = (n) => String(n).padStart(4, '0');
+
+  const canvas = document.getElementById('frameCanvas');
+  const journey = document.getElementById('journey');
+  const inner = journey ? journey.querySelector('.journey-inner') : null;
+  const loader = document.getElementById('loader');
+  const loaderFill = document.getElementById('loaderFill');
+  const captions = Array.from(document.querySelectorAll('.caption'));
+  const dots = Array.from(document.querySelectorAll('.progress-dot'));
+
+  // Fade the centered logo out once the journey is behind us.
+  const nav = document.querySelector('.nav');
+  function updateNav() {
+    if (!nav || !journey) return;
+    const journeyBottom = journey.offsetTop + journey.offsetHeight;
+    nav.classList.toggle('nav--hidden', window.scrollY > journeyBottom - window.innerHeight * 0.5);
+  }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+
+  const prefersReduced =
+    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReduced || !canvas || !canvas.getContext) {
+    document.documentElement.classList.add('no-scrub');
+    if (loader) loader.remove();
+  } else {
+    document.documentElement.classList.add('has-scrub');
+    const ctx = canvas.getContext('2d');
+    const MOBILE_BAND = 0.5; // portrait: image fills the bottom half of the screen
+
+    // ---- frames + fit mode --------------------------------------------------
+    // Every room uses the same desktop (landscape) frames. On portrait phones we
+    // don't crop the sides — we fit the full frame to the width and letterbox
+    // (contain); on landscape we fill the screen (cover).
+    let portrait, view;
+    const hexToRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t].map((v) => Math.round(v));
+    function buildView() {
+      portrait = window.innerHeight > window.innerWidth;
+      view = ROOMS.map((r) => ({ id: r.id, count: r.desktop, focusX: r.focusX, top: hexToRgb(r.top || '#3a4a55') }));
+    }
+    buildView();
+    const src = (ri, i) => `/frames/desktop/${view[ri].id}/frame_${pad(i + 1)}.jpg`;
+
+    // ---- lazy image store with a bounded decode window ---------------------
+    // ~1,500 high-res frames can't all be decoded at once. Frames load
+    // (compressed) per room on demand; only a sliding window around the current
+    // frame is kept decoded. Bounded RAM, no first-draw decode hitch.
+    let imgs, started, decodeReq, roomKicked;
+    function resetStore() {
+      imgs = view.map((v) => new Array(v.count).fill(null));
+      started = view.map((v) => new Array(v.count).fill(false));
+      decodeReq = view.map(() => new Set());
+      roomKicked = new Array(N_ROOMS).fill(false);
+    }
+    resetStore();
+
+    function ensure(ri, i) {
+      if (i < 0 || ri < 0 || ri >= N_ROOMS || i >= view[ri].count || started[ri][i]) return;
+      started[ri][i] = true;
+      const im = new Image();
+      im.decoding = 'async';
+      im.onload = () => { imgs[ri][i] = im.naturalWidth ? im : null; };
+      im.onerror = () => { imgs[ri][i] = null; };
+      im.src = src(ri, i);
+    }
+    function kickRoom(ri) {
+      if (ri < 0 || ri >= N_ROOMS || roomKicked[ri]) return;
+      roomKicked[ri] = true;
+      for (let i = 0; i < view[ri].count; i++) ensure(ri, i);
+    }
+
+    function frameOrNearest(ri, i) {
+      const arr = imgs[ri];
+      if (!arr) return null;
+      if (arr[i]) return arr[i];
+      for (let d = 1; d < arr.length; d++) {
+        if (arr[i - d]) return arr[i - d];
+        if (arr[i + d]) return arr[i + d];
+      }
+      return null;
+    }
+
+    // Ask the browser to decode a window of frames ahead of the playhead so
+    // they're ready to draw with no synchronous decode. Prune far frames so
+    // they can be re-decoded if the user scrolls back to them later.
+    function decodeWindow(ri, i, dir) {
+      const cnt = view[ri].count, set = decodeReq[ri];
+      const ahead = dir >= 0 ? 22 : 8, behind = dir >= 0 ? 8 : 22;
+      for (let f = Math.max(0, i - behind); f <= Math.min(cnt - 1, i + ahead); f++) {
+        const im = imgs[ri][f];
+        if (im && !set.has(f) && im.decode) { set.add(f); im.decode().catch(() => {}); }
+      }
+      for (const f of set) if (f < i - 70 || f > i + 70) set.delete(f);
+    }
+
+    // ---- canvas sizing -----------------------------------------------------
+    let vw = 0, vh = 0, dpr = 1;
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      vw = window.innerWidth; vh = window.innerHeight;
+      canvas.width = Math.round(vw * dpr); canvas.height = Math.round(vh * dpr);
+      canvas.style.width = vw + 'px'; canvas.style.height = vh + 'px';
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium';
+      // portrait: image band is anchored to the bottom; publish its height so the
+      // caption can sit directly above it (no floating empty bands).
+      const root = document.documentElement;
+      if (portrait) {
+        root.classList.add('is-portrait');
+        root.style.setProperty('--band-h', (vh * MOBILE_BAND) + 'px');
+      } else {
+        root.classList.remove('is-portrait');
+      }
+      needsDraw = true;
+    }
+    function drawCover(img, fx, contain, zoom) {
+      if (!img) return;
+      zoom = zoom || 1;
+      const cw = canvas.width, ch = canvas.height;
+      const ir = img.naturalWidth / img.naturalHeight;
+      let dw, dh, ox, oy;
+      if (contain) {
+        // fill the bottom ~half of the screen: cover a bottom band region, cropping
+        // the sides moderately (keeps the centre of each shot). Caption sits above.
+        const bandH = ch * MOBILE_BAND;
+        if (cw / bandH > ir) { dw = cw; dh = cw / ir; }
+        else { dh = bandH; dw = bandH * ir; }
+        dw *= zoom; dh *= zoom;
+        ox = (cw - dw) / 2;
+        oy = ch - bandH + (bandH - dh) / 2; // zoom toward the band centre (overflow hidden by the top gradient)
+      } else {
+        // cover: fill the screen, holding the focus point at centre (clamped)
+        const cr = cw / ch;
+        if (cr > ir) { dw = cw; dh = cw / ir; } else { dh = ch; dw = ch * ir; }
+        dw *= zoom; dh *= zoom;
+        fx = fx == null ? 0.5 : fx;
+        ox = Math.min(0, Math.max(cw - dw, cw * 0.5 - fx * dw));
+        oy = Math.min(0, Math.max(ch - dh, (ch - dh) / 2));
+      }
+      ctx.drawImage(img, ox, oy, dw, dh);
+    }
+
+    function scrollProgress() {
+      if (!inner) return 0;
+      const scrollable = inner.offsetHeight - vh;
+      if (scrollable <= 0) return 0;
+      return Math.min(1, Math.max(0, -inner.getBoundingClientRect().top / scrollable));
+    }
+
+    let cur = 0, prevCur = 0, running = false, needsDraw = true, lastSig = '', lastT = 0;
+
+    function render() {
+      const maxRoom = N_ROOMS - 1;
+      let room = Math.min(maxRoom, Math.max(0, Math.floor(cur)));
+      let local = cur - room; if (local < 0) local = 0; if (local > 1) local = 1;
+
+      const N = view[room].count;
+      // The exterior clip runs out of frames just as the door opens, so the glimpse
+      // of the living room is tiny. For that room we decelerate into the door, then
+      // hold the last frame and keep pushing in (digital zoom) to extend the reveal.
+      let ff, zoom = 1;
+      if (room === 0) {
+        const HOLD = 0.72;
+        if (local <= HOLD) {
+          const p = local / HOLD;
+          ff = (1 - Math.pow(1 - p, 1.8)) * (N - 1); // ease-out: slow as we reach the door
+        } else {
+          ff = N - 1;
+          zoom = 1 + ((local - HOLD) / (1 - HOLD)) * 0.22; // continue into the living room
+        }
+      } else {
+        ff = local * (N - 1);
+      }
+      let i = Math.floor(ff), f = ff - i;
+      if (i >= N - 1) { i = N - 1; f = 0; }
+
+      const FADE = room === 0 ? 0.9 : 0.82; // hold the living room longer before crossfading
+      const nextAlpha = local > FADE && room < maxRoom ? (local - FADE) / (1 - FADE) : 0;
+
+      // stream neighbouring rooms; keep a decoded window around the playhead
+      kickRoom(room); kickRoom(room + 1); if (local < 0.2) kickRoom(room - 1);
+      decodeWindow(room, i, cur - prevCur >= 0 ? 1 : -1);
+      if (nextAlpha > 0) { ensure(room + 1, 0); ensure(room + 1, 1); }
+
+      const sig = room + ':' + i + ':' + f.toFixed(3) + ':' + nextAlpha.toFixed(3) + ':' + zoom.toFixed(3);
+      if (sig === lastSig && !needsDraw) return;
+      const base = frameOrNearest(room, i);
+      if (!base) { needsDraw = true; return; } // hold last frame until something loads
+      lastSig = sig; needsDraw = false;
+
+      const fx = view[room].focusX;
+      ctx.globalAlpha = 1;
+      drawCover(base, fx, portrait, zoom);
+      if (f > 0.001) {
+        const nxt = frameOrNearest(room, i + 1);
+        if (nxt) { ctx.globalAlpha = f; drawCover(nxt, fx, portrait, zoom); ctx.globalAlpha = 1; }
+      }
+      if (nextAlpha > 0) {
+        const nr = frameOrNearest(room + 1, 0);
+        if (nr) { ctx.globalAlpha = nextAlpha; drawCover(nr, view[room + 1].focusX, portrait); ctx.globalAlpha = 1; }
+      }
+      // portrait: fill the area above the bottom image band with a gradient from the
+      // theme navy down to the image's own top-edge colour — so the space reads as
+      // sky/ceiling and shifts to match whichever room is on screen.
+      if (portrait) {
+        // Fill the area above the band with a gradient from the theme navy down to
+        // the image's OWN top-edge colour, sampled live so the join is 100% seamless.
+        // The gradient overlaps 1px into the image to eliminate any sub-pixel gap.
+        const bandTop = Math.round(canvas.height * (1 - MOBILE_BAND));
+        const s = ctx.getImageData(canvas.width >> 1, Math.min(canvas.height - 1, bandTop + 1), 1, 1).data;
+        const g = ctx.createLinearGradient(0, 0, 0, bandTop + 1);
+        g.addColorStop(0, '#081a28');
+        g.addColorStop(1, `rgb(${s[0]},${s[1]},${s[2]})`);
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, canvas.width, bandTop + 1);
+      }
+      // (The last frame stays crisp; the section below fades up into it — see the
+      //  .manifesto top gradient in CSS — so the image is never dissolved to a flat colour.)
+      updateCaptions(room, local, nextAlpha);
+      updateDots(cur);
+    }
+
+    function tick(now) {
+      if (!running) return;
+      if (!lastT) lastT = now;
+      const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+      // Lenis already smooths the scroll position with momentum, so the canvas
+      // tracks it directly (no second easing pass, which would add lag).
+      prevCur = cur;
+      cur = scrollProgress() * N_ROOMS;
+      render();
+      requestAnimationFrame(tick);
+    }
+
+    function captionOpacity(local, isFirst) {
+      const IN = 0.14, OUT = 0.72;
+      if (!isFirst && local < IN) return local / IN; // first room's caption starts visible
+      if (local > OUT) return Math.max(0, 1 - (local - OUT) / (1 - OUT));
+      return 1;
+    }
+    function updateCaptions(room, local, nextAlpha) {
+      captions.forEach((el, idx) => {
+        let op = 0, y = 24;
+        if (idx === room) {
+          const c = captionOpacity(local, room === 0);
+          op = c * (1 - nextAlpha * 0.6);
+          y = (1 - c) * 24;
+        }
+        el.style.opacity = op.toFixed(3);
+        el.style.transform = `translateY(${y.toFixed(1)}px)`;
+      });
+    }
+    function updateDots(pos) {
+      const active = Math.min(N_ROOMS - 1, Math.max(0, Math.floor(pos)));
+      dots.forEach((d, idx) => d.classList.toggle('is-active', idx === active));
+    }
+
+    // ---- boot: load + decode the first frames of room 0, then reveal -------
+    async function boot() {
+      kickRoom(0);
+      const need = Math.min(view[0].count, 18);
+      await new Promise((resolve) => {
+        let done = false;
+        const check = () => {
+          if (done) return;
+          let ready = 0;
+          for (let i = 0; i < need; i++) if (imgs[0][i]) ready++;
+          if (loaderFill) loaderFill.style.width = (ready / need) * 100 + '%';
+          if (ready >= need) { done = true; resolve(); } else requestAnimationFrame(check);
+        };
+        check();
+        setTimeout(() => { if (!done) { done = true; resolve(); } }, 9000); // safety
+      });
+      await Promise.all(
+        imgs[0].slice(0, need).filter(Boolean).map((im) => (im.decode ? im.decode().catch(() => {}) : null))
+      );
+      if (loader) { loader.classList.add('is-done'); setTimeout(() => loader.remove(), 700); }
+      resize();
+      // Momentum smooth-scroll: one flick coasts and eases out, so the wheel no
+      // longer "brakes" between notches. lerp lower = longer glide.
+      const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 1.25, smoothWheel: true });
+      window.__lenis = lenis;
+      function lraf(t) { lenis.raf(t); requestAnimationFrame(lraf); }
+      requestAnimationFrame(lraf);
+      running = true;
+      requestAnimationFrame(tick);
+    }
+
+    function onViewportChange() {
+      buildView();  // same frames in both orientations; only the fit (cover/contain) changes
+      resize();     // sets needsDraw
+    }
+    let resizeTimer;
+    window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(onViewportChange, 150); });
+    window.addEventListener('orientationchange', () => setTimeout(onViewportChange, 250));
+
+    boot();
+  }
+</script>
+
 <style>
+  /* ---------- Loader ---------- */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: var(--cine-bg);
+    transition: opacity 0.6s ease;
+  }
+  .loader.is-done { opacity: 0; pointer-events: none; }
+  .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+  .loader-bar {
+    width: 220px; height: 3px; border-radius: 999px;
+    background: rgba(184, 200, 224, 0.2); overflow: hidden;
+  }
+  .loader-fill { display: block; height: 100%; width: 0%; background: var(--highlight); transition: width 0.2s ease; }
+  .loader-label {
+    margin: 0; color: rgba(255,255,255,0.6); font-size: 0.8rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+
+  /* ---------- Nav ---------- */
   .nav {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: rgba(250, 248, 245, 0.55);
-    backdrop-filter: saturate(150%) blur(14px);
-    -webkit-backdrop-filter: saturate(150%) blur(14px);
-    border-bottom: 1px solid var(--rule);
+    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    display: flex; justify-content: center;
+    padding: 0.75rem 1rem;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
-
-  .nav-inner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 0;
-    padding-bottom: 0;
+  .nav--hidden { opacity: 0; transform: translateY(-12px); }
+  .brand { pointer-events: auto; display: inline-flex; }
+  .brand:hover { text-decoration: none; }
+  .wordmark { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+  /* modern, "liquid glass": a bright glassy gradient fill with soft depth */
+  .wordmark-name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 700; font-size: 1.9rem; letter-spacing: 0.16em; text-transform: uppercase;
+    background: linear-gradient(180deg, #ffffff 0%, #eef4ff 40%, #bccde8 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4)) drop-shadow(0 3px 14px rgba(0,0,0,0.28));
   }
-
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    color: var(--ink);
+  .wordmark-sub {
+    font-family: 'Inter', sans-serif; font-weight: 500;
+    font-size: 0.62rem; letter-spacing: 0.5em; text-transform: uppercase;
+    color: rgba(224,234,248,0.9); margin: 0.5rem 0 0 0.5em; /* nudge for the tracking */
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
   }
+  .wordmark--lg .wordmark-name { font-size: 3rem; }
+  .wordmark--lg .wordmark-sub { font-size: 0.85rem; margin-top: 0.7rem; }
 
-  .brand:hover {
-    text-decoration: none;
-  }
-
-  .brand-logo {
-    display: block;
-    width: 342px;
-    height: 144px;
-    object-fit: cover;
-    object-position: center;
-  }
-
-  @media (max-width: 720px) {
-    .brand-logo {
-      width: 234px;
-      height: 100px;
-    }
-  }
-
-  .hero {
-    padding: clamp(4rem, 10vw, 7rem) 0 clamp(3rem, 7vw, 5rem);
-    background:
-      radial-gradient(1200px 500px at 80% -10%, rgba(195, 223, 225, 0.5), transparent 60%),
-      radial-gradient(900px 400px at -10% 110%, rgba(25, 79, 110, 0.06), transparent 60%);
-  }
-
-  .hero-inner {
-    max-width: 880px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .hero-inner .lead {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-inner .cta-row {
-    justify-content: center;
-  }
-
-  .hero h1 em {
-    font-style: normal;
-    color: var(--accent);
-  }
-
-  .hero-sep {
-    display: inline-block;
-    width: 1.5px;
-    height: 0.85em;
-    background: var(--accent);
-    vertical-align: -0.05em;
-    margin: 0 0.12em;
-  }
-
-  .hero-only-mobile {
-    display: inline-block;
-  }
-
-  @media (max-width: 720px) {
-    .hero h1 {
-      font-size: clamp(1.6rem, 6.8vw, 2.4rem);
-    }
-    .hero .hero-call-inner {
-      font-size: clamp(1.05rem, 1.54vw, 1.33rem);
-    }
-    .hero .cta-row .btn {
-      padding: 0.6rem 1rem;
-      font-size: 0.7rem;
-    }
-  }
-
-  .lead {
-    font-size: clamp(1.05rem, 1.6vw, 1.2rem);
-    color: var(--muted);
-    max-width: 640px;
-    margin-bottom: 2rem;
-  }
-
-  .cta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .hero-call {
-    margin: 0 0 1.25rem;
-  }
-
-  .hero-call-inner {
-    display: inline-block;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 500;
-    font-style: normal;
-    color: var(--accent-deep);
-    font-size: clamp(1.5rem, 2.2vw, 1.9rem);
-    letter-spacing: -0.01em;
-    line-height: 1.15;
-    background: var(--highlight);
-    padding: 0.35em 0.7em;
-    border-radius: 6px;
-  }
-
-  .dict-entry {
-    margin: 1.25rem 0 1.75rem;
-    padding: 1.75rem 0 1.75rem;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .dict-head {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.9rem;
-    margin-bottom: 0.35rem;
-  }
-
-  .dict-word {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(1.9rem, 4vw, 2.5rem);
-    font-weight: 500;
-    margin: 0;
-    color: var(--ink);
-  }
-
-  .dict-dot {
-    color: var(--accent);
-    margin: 0 0.05em;
-  }
-
-  .dict-pron {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-style: italic;
-    color: var(--accent);
-    font-size: 1.1rem;
-  }
-
-  .dict-meta {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin-bottom: 0.9rem;
-    letter-spacing: 0.02em;
-  }
-
-  .dict-meta em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
-  .dict-def {
-    margin: 0;
-    color: var(--ink);
-    line-height: 1.55;
-    font-size: 1.05rem;
-  }
-
-  .section-head {
-    margin-bottom: 3rem;
-    max-width: 720px;
-  }
-
-  .services {
-    padding: clamp(4rem, 8vw, 6rem) 0;
-  }
-
-  .service-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1rem;
-  }
-
-  @media (max-width: 1080px) {
-    .service-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 560px) {
-    .service-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .service-card {
-    background: var(--surface);
-    padding: 1.5rem 1.25rem;
-    border-radius: 14px;
-    border: 1px solid var(--rule);
+  /* ---------- Intro ---------- */
+  .intro {
     position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .service-card h3 {
-    font-size: 1.05rem;
-  }
-
-  .service-card p {
-    font-size: 0.92rem;
-    line-height: 1.55;
-  }
-
-  .service-card h3 {
-    margin-bottom: 0.75rem;
-  }
-
-  .service-card p {
-    margin-bottom: 0;
-  }
-
-  .service-card--featured {
-    background: linear-gradient(180deg, #fff 0%, #f0f7f8 100%);
-    border-color: rgba(25, 79, 110, 0.25);
-  }
-
-  .service-tag {
-    display: inline-block;
-    margin-top: 1.25rem;
-    padding: 0.3rem 0.7rem;
-    border-radius: 999px;
-    background: var(--highlight);
-    color: var(--accent-dark);
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-  }
-
-  .about {
-    padding: clamp(3rem, 7vw, 5rem) 0;
-    background: var(--surface);
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .about-inner {
-    max-width: 760px;
-    margin: 0 auto;
-  }
-
-  .about-pitch {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(1.2rem, 2vw, 1.4rem);
-    line-height: 1.45;
-    color: var(--ink);
-    margin: 0 0 2rem;
-  }
-
-  .about-pitch strong {
-    color: var(--accent);
-    font-weight: 500;
-    font-style: italic;
-  }
-
-  .about-copy p:last-child {
-    margin-bottom: 0;
-  }
-
-  .work {
-    padding: clamp(4rem, 8vw, 6rem) 0;
-  }
-
-  .work-grid {
+    /* not full-height: the top ~18% of the first frame already shows below it,
+       so the walkthrough is peeking before you scroll */
+    min-height: 82svh;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.25rem;
+    place-items: center;
+    text-align: center;
+    padding: 4rem 1.25rem 6rem;
+    color: #fff;
+    /* Dark navy up top for the text, gradually blending to the color of the
+       exterior's daytime sky (#dcedfa) so the scroll into the walkthrough is
+       seamless — a continuation of the sky, with no image shown in the panel. */
+    background:
+      radial-gradient(1100px 520px at 50% -12%, rgba(25,79,110,0.42), transparent 60%),
+      linear-gradient(180deg, var(--cine-bg) 0%, var(--cine-bg) 30%, #33465a 50%, #7f9bbd 74%, #bcd6f2 90%, #dcedfa 100%);
+  }
+  .intro-inner { max-width: 780px; position: relative; z-index: 2; }
+  .intro .eyebrow { color: var(--highlight); }
+  .intro h1 {
+    color: #fff;
+    font-size: clamp(2.4rem, 6.5vw, 4.6rem);
+    line-height: 1.04;
+    margin-bottom: 1.25rem;
+  }
+  .intro h1 em { font-style: italic; color: var(--highlight); }
+  .intro .lead {
+    color: rgba(255,255,255,0.72);
+    font-size: clamp(1.05rem, 1.7vw, 1.25rem);
+    max-width: 560px; margin: 0 auto 3rem;
+  }
+  .scroll-cue {
+    position: absolute;
+    left: 50%; bottom: 1.6rem;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 0.9rem;
+    /* sits over the warm cream bottom of the panel, so it's dark for contrast */
+    color: rgba(10,28,42,0.8);
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    text-shadow: 0 1px 10px rgba(255,255,255,0.35);
+  }
+  .scroll-arrow {
+    width: 1.5px; height: 58px;
+    background: linear-gradient(rgba(10,28,42,0.12), rgba(10,28,42,0.55));
+    position: relative; overflow: hidden; border-radius: 2px;
+  }
+  /* a lit dot travels down the line, "pulling" the eye into the image */
+  .scroll-arrow-dot {
+    position: absolute; top: 0; left: 0; width: 100%; height: 45%;
+    background: linear-gradient(rgba(25,79,110,0), var(--accent));
+    animation: cue 1.9s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  }
+  .scroll-chevron {
+    width: 12px; height: 12px; margin-top: -0.35rem;
+    border-right: 1.5px solid var(--accent-deep);
+    border-bottom: 1.5px solid var(--accent-deep);
+    transform: rotate(45deg);
+    animation: chev 1.9s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  }
+  @keyframes cue {
+    0% { transform: translateY(-110%); opacity: 0; }
+    35% { opacity: 1; }
+    100% { transform: translateY(230%); opacity: 0; }
+  }
+  @keyframes chev {
+    0%, 100% { transform: rotate(45deg) translate(0, 0); opacity: 0.5; }
+    50% { transform: rotate(45deg) translate(3px, 3px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-arrow-dot, .scroll-chevron { animation: none; }
   }
 
-  .work-tile {
-    margin: 0;
+  /* ---------- Journey (scrub) ---------- */
+  .journey { position: relative; background: var(--cine-bg); }
+  .journey-inner { position: relative; height: 880vh; } /* 4 rooms × ~220vh */
+  .journey-pin {
+    position: sticky; top: 0;
+    height: 100svh; width: 100%; overflow: hidden;
+  }
+  .frame-canvas { display: block; width: 100%; height: 100%; background: var(--cine-bg); }
+
+  .scrim {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      /* top: a short sky-colored fade only over the sky above the roofline, so the
+         seam is invisible but the full roof stays visible (no fade over the house).
+         (No bottom darkening — the last frame's floor must stay true so the closing
+         section blends into it; captions rely on their own text-shadow.) */
+      linear-gradient(180deg, #dcedfa 0%, rgba(220,237,250,0) 6%);
   }
 
-  .work-image {
+  .caption-layer { position: absolute; inset: 0; pointer-events: none; }
+  .caption {
+    position: absolute;
+    left: clamp(1.5rem, 6vw, 6rem);
+    bottom: clamp(3.5rem, 12vh, 8rem);
+    max-width: min(560px, 76vw);
+    color: #fff;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  .caption-kicker {
     display: block;
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: 14px;
-    border: 1px solid var(--rule);
-    background: var(--highlight);
-    transition: transform 0.4s ease;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem); letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--highlight); margin-bottom: 1rem; font-weight: 600;
+  }
+  .caption-title {
+    color: #fff;
+    font-size: clamp(2rem, 5.2vw, 3.4rem);
+    line-height: 1.05; margin: 0 0 0.8rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 2px 30px rgba(0,0,0,0.45);
+  }
+  .caption-body {
+    color: rgba(255,255,255,0.86);
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    margin: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 20px rgba(0,0,0,0.5);
   }
 
-  .work-tile:hover .work-image {
-    transform: scale(1.015);
+  .progress-rail {
+    position: absolute;
+    right: clamp(1.1rem, 3vw, 2.5rem);
+    top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 0.85rem;
+  }
+  .progress-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.28);
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .progress-dot.is-active { background: var(--highlight); transform: scale(1.5); }
+
+  /* When scrub is active, hide the still fallback. When it's not, hide the canvas journey. */
+  :global(html.has-scrub) .stills { display: none; }
+  :global(html.no-scrub) .journey { display: none; }
+  :global(html:not(.has-scrub):not(.no-scrub)) .stills { display: none; }
+
+  /* ---------- Stills fallback ---------- */
+  .stills { background: var(--cine-bg); padding: 4rem 1.25rem; display: grid; gap: 2rem; }
+  .still { margin: 0; max-width: 1000px; width: 100%; margin-inline: auto; }
+  .still img {
+    width: 100%; border-radius: 14px; display: block;
+    aspect-ratio: 16 / 9; object-fit: cover;
+  }
+  .still figcaption { display: flex; flex-direction: column; gap: 0.35rem; padding-top: 1rem; color: #fff; }
+  .still figcaption strong {
+    font-family: 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 500;
+  }
+  .still figcaption span:last-child { color: rgba(255,255,255,0.7); }
+
+  /* ---------- Closing (manifesto + contact) ----------
+     Starts at the bedroom floor colour (top) and fades down to the dark theme by
+     the bottom of the page — the mirror of the sky at the top. The last frame is
+     left crisp; this section carries the blend. */
+  .closing {
+    background: linear-gradient(180deg, #63503b 0%, #63503b 5%, var(--cine-bg) 100%);
+  }
+  /* ---------- Manifesto ---------- */
+  .manifesto {
+    color: #fff;
+    padding: clamp(4rem, 10vw, 7rem) 0;
+    background: transparent;
+  }
+  .manifesto-inner { max-width: 760px; }
+  .dict {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    line-height: 1.4; color: #fff; margin: 0 0 1.5rem;
+  }
+  .dict span { color: var(--highlight); font-style: italic; font-size: 0.75em; }
+  .dict em { color: var(--highlight); font-style: italic; }
+  .manifesto-body {
+    color: rgba(255,255,255,0.72);
+    font-size: clamp(1.05rem, 1.6vw, 1.2rem); margin: 0;
   }
 
-  .work-tile figcaption {
-    display: flex;
-    flex-direction: column;
-    padding: 0.9rem 0.25rem 0;
-    font-size: 0.95rem;
-  }
-
-  .work-tile figcaption span {
-    color: var(--muted);
-    font-size: 0.85rem;
-  }
-
-  .work-note {
-    margin-top: 2rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-
+  /* ---------- Contact ---------- */
   .contact {
-    padding: clamp(4rem, 8vw, 6rem) 0;
-    background: var(--accent);
+    background: transparent; /* sits on the .closing gradient */
     color: #fff;
+    padding: clamp(5rem, 10vw, 8rem) 0 clamp(6rem, 12vw, 9rem);
+  }
+  /* centered, minimal — echoes the top section */
+  .contact-inner { max-width: 640px; margin: 0 auto; text-align: center; }
+  .contact .eyebrow { color: var(--highlight); }
+  .contact h2 { color: #fff; font-size: clamp(2.2rem, 4.5vw, 3.4rem); }
+  .contact p { color: rgba(255,255,255,0.72); max-width: 540px; margin: 0 auto; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2.5rem; justify-content: center; }
+
+  /* liquid-glass CTA buttons (echo the wordmark's glass treatment) */
+  .glass-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.6rem 1.5rem; border-radius: 999px;
+    font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.85rem;
+    letter-spacing: 0.03em; color: #fff;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.015));
+    border: 1px solid rgba(255,255,255,0.15);
+    -webkit-backdrop-filter: blur(10px) saturate(150%); backdrop-filter: blur(10px) saturate(150%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 3px 12px rgba(0,0,0,0.15);
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .glass-btn:hover {
+    text-decoration: none; transform: translateY(-1px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.1));
+    border-color: rgba(255,255,255,0.4);
+  }
+  .contact-office {
+    margin: 2.75rem 0 0; color: rgba(255,255,255,0.5);
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
   }
 
-  .contact .eyebrow {
-    color: var(--highlight);
-  }
-
-  .contact h2 {
-    color: #fff;
-  }
-
-  .contact p {
-    color: rgba(255, 255, 255, 0.78);
-    max-width: 520px;
-  }
-
-  .contact .btn-primary {
-    background: #fff;
-    color: var(--accent);
-  }
-
-  .contact .btn-primary:hover {
-    background: var(--highlight);
-  }
-
-  .contact .btn-outline {
-    background: #fff;
-    color: var(--accent-deep);
-    border-color: transparent;
-  }
-
-  .contact .btn-outline:hover {
-    background: var(--highlight);
-    color: var(--accent-deep);
-  }
-
-  .contact-inner {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: clamp(2rem, 6vw, 4rem);
-    align-items: start;
-  }
-
-  @media (max-width: 760px) {
-    .contact-inner {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .contact-card {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 16px;
-    padding: 1.75rem;
-  }
-
-  .contact-card dl {
-    margin: 0;
-    display: grid;
-    gap: 1rem;
-  }
-
-  .contact-card dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--highlight);
-    margin-bottom: 0.15rem;
-  }
-
-  .contact-card dd {
-    margin: 0;
-    color: #fff;
-    font-size: 0.98rem;
-  }
-
-  .contact-card a {
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  }
-
-  .contact-card a:hover {
-    text-decoration: none;
-    border-bottom-color: #fff;
-  }
-
+  /* ---------- Footer ---------- */
   .foot {
-    padding: 1.75rem 0 2.25rem;
-    color: var(--muted);
-    font-size: 0.85rem;
+    padding: 1.75rem 0 2.25rem; color: rgba(255,255,255,0.5); font-size: 0.85rem;
+    background: var(--cine-bg);
+  }
+  .foot-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+
+  @media (max-width: 720px) {
+    .wordmark-name { font-size: 1.55rem; letter-spacing: 0.14em; }
+    .wordmark-sub { font-size: 0.56rem; letter-spacing: 0.44em; }
+    .caption { left: 1.25rem; right: 1.25rem; bottom: 4.5rem; }
   }
 
-  .foot-inner {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+  /* Portrait phones: no separate intro — the image walkthrough IS the top section,
+     so the very first scroll moves through the images (image anchored to bottom). */
+  :global(html.is-portrait) .intro { display: none; }
+  /* mobile draws its own per-room gradient above the band, so hide the CSS scrim */
+  :global(html.is-portrait) .scrim { display: none; }
+
+  /* the image band is anchored to the bottom of the screen, so the caption sits
+     directly above it and the progress dots move down out of it. */
+  :global(html.is-portrait) .caption {
+    left: 1.25rem; right: 1.25rem;
+    top: 0; bottom: var(--band-h, 40vh);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 4.5rem 0 1.6rem; /* clear the logo up top, small gap above the band */
   }
+  :global(html.is-portrait) .progress-rail {
+    top: auto; bottom: 1.1rem; left: 0; right: 0; transform: none;
+    flex-direction: row; justify-content: center; gap: 0.55rem;
+  }
+</style>
+
+<!-- Lenis (momentum smooth-scroll) recommended base styles -->
+<style is:global>
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
 </style>

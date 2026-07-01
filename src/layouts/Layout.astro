@@ -5,8 +5,8 @@ interface Props {
 }
 
 const {
-  title = 'Bravura Builders — Atlanta Renovations & New Construction',
-  description = 'Bravura Builders is an Alpharetta-based general contractor delivering renovations, ground-up construction, and design + rendering services across metro Atlanta.',
+  title = 'Bravura Builders — Kitchen, Bath & Home Renovations in Metro Atlanta',
+  description = 'Bravura Builders transforms the rooms you use most — kitchens, baths, and laundry rooms — into beautifully constructed spaces. High-craft renovations and new construction across metro Atlanta.',
 } = Astro.props;
 ---
 
@@ -40,6 +40,7 @@ const {
     --accent: #194f6e;
     --accent-dark: #0f3a52;
     --accent-deep: #062032;
+    --cine-bg: #081a28;
     --highlight: #b8c8e0;
     --bg: #faf8f5;
     --surface: #ffffff;
@@ -62,10 +63,12 @@ const {
     padding: 0;
   }
 
+  html { background: var(--cine-bg); }
+
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: var(--ink);
-    background: var(--bg);
+    background: var(--cine-bg);
     font-size: 17px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -153,6 +156,17 @@ const {
   .btn-outline:hover {
     background: var(--accent);
     color: #fff;
+  }
+
+  .btn-solid {
+    background: #fff;
+    color: var(--accent-deep);
+    border-color: transparent;
+  }
+
+  .btn-solid:hover {
+    background: var(--highlight);
+    color: var(--accent-deep);
   }
 
   .btn-stacked {
