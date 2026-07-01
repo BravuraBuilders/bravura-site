@@ -308,6 +308,9 @@ const pad = (n: number) => String(n).padStart(4, '0');
         root.style.setProperty('--band-h', (vh * MOBILE_BAND) + 'px');
       } else {
         root.classList.remove('is-portrait');
+        // desktop covers the whole viewport — drop any floor tint left over from portrait
+        root.style.backgroundColor = '';
+        if (journey) journey.style.backgroundColor = '';
       }
       needsDraw = true;
     }
@@ -411,6 +414,14 @@ const pad = (n: number) => String(n).padStart(4, '0');
         g.addColorStop(1, `rgb(${s[0]},${s[1]},${s[2]})`);
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, canvas.width, bandTop + 1);
+        // The mobile URL bar hides on scroll and the browser fills the freed strip at the
+        // bottom with the ROOT background colour. Paint that (html + journey) with the
+        // image's own bottom-edge pixel (the floor), sampled live, so the strip reads as the
+        // floor continuing instead of a flat dark-blue block — and shifts room to room.
+        const fp = ctx.getImageData(canvas.width >> 1, canvas.height - 2, 1, 1).data;
+        const floorCol = `rgb(${fp[0]},${fp[1]},${fp[2]})`;
+        document.documentElement.style.backgroundColor = floorCol;
+        if (journey) journey.style.backgroundColor = floorCol;
       }
       // (The last frame stays crisp; the section below fades up into it — see the
       //  .manifesto top gradient in CSS — so the image is never dissolved to a flat colour.)
