@@ -269,12 +269,11 @@ const pad = (n: number) => String(n).padStart(4, '0');
     // ~1,500 high-res frames can't all be decoded at once. Frames load
     // (compressed) per room on demand; only a sliding window around the current
     // frame is kept decoded. Bounded RAM, no first-draw decode hitch.
-    let imgs, started, decodeReq, roomKicked;
+    let imgs, started, decodeReq;
     function resetStore() {
       imgs = view.map((v) => new Array(v.count).fill(null));
       started = view.map((v) => new Array(v.count).fill(false));
       decodeReq = view.map(() => new Set());
-      roomKicked = new Array(N_ROOMS).fill(false);
     }
     resetStore();
 
@@ -287,10 +286,15 @@ const pad = (n: number) => String(n).padStart(4, '0');
       im.onerror = () => { imgs[ri][i] = null; };
       im.src = src(ri, i);
     }
-    function kickRoom(ri) {
-      if (ri < 0 || ri >= N_ROOMS || roomKicked[ri]) return;
-      roomKicked[ri] = true;
-      for (let i = 0; i < view[ri].count; i++) ensure(ri, i);
+    // Load only a bounded window of frames around the playhead (biased in the scroll
+    // direction), not the whole room — a full room can be 400+ frames, and kicking every
+    // request at once saturates the connection so near-playhead frames arrive late (jank).
+    // Frames outside the window simply load lazily as they're approached.
+    function loadWindow(ri, i, dir) {
+      if (ri < 0 || ri >= N_ROOMS) return;
+      const cnt = view[ri].count;
+      const ahead = dir >= 0 ? 70 : 25, behind = dir >= 0 ? 25 : 70;
+      for (let f = Math.max(0, i - behind); f <= Math.min(cnt - 1, i + ahead); f++) ensure(ri, f);
     }
 
     function frameOrNearest(ri, i) {
@@ -414,9 +418,13 @@ const pad = (n: number) => String(n).padStart(4, '0');
       const FADE = room === 0 ? 0.9 : 0.82; // hold the living room longer before crossfading
       const nextAlpha = local > FADE && room < maxRoom ? (local - FADE) / (1 - FADE) : 0;
 
-      // stream neighbouring rooms; keep a decoded window around the playhead
-      kickRoom(room); kickRoom(room + 1); if (local < 0.2) kickRoom(room - 1);
-      decodeWindow(room, i, cur - prevCur >= 0 ? 1 : -1);
+      // stream a bounded window around the playhead + the next room's opening for the
+      // crossfade; keep a decoded window around the playhead
+      const streamDir = cur - prevCur >= 0 ? 1 : -1;
+      loadWindow(room, i, streamDir);
+      loadWindow(room + 1, 0, 1);
+      if (local < 0.2 && room > 0) loadWindow(room - 1, view[room - 1].count - 1, -1);
+      decodeWindow(room, i, streamDir);
       if (nextAlpha > 0) { ensure(room + 1, 0); ensure(room + 1, 1); }
 
       // desktop intro logo: solid while the establishing shot holds, then fades out ~by the door.
@@ -556,7 +564,7 @@ const pad = (n: number) => String(n).padStart(4, '0');
 
     // ---- boot: load + decode the first frames of room 0, then reveal -------
     async function boot() {
-      kickRoom(0);
+      loadWindow(0, 0, 1);
       const need = Math.min(view[0].count, 18);
       await new Promise((resolve) => {
         let done = false;
