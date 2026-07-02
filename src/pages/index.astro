@@ -16,8 +16,8 @@ const address = '11720 Amber Park Dr, Alpharetta GA 30009';
 const rooms = [
   {
     id: 'exterior',
-    desktop: 241,
-    mobile: 241,
+    desktop: 443, // arrival (1-241) + seamless living-room push-in (Livingroom1, 242-443)
+    mobile: 443,
     exteriorBoth: true,
     focusX: 0.5, // image x-fraction held at screen center; raise → house shifts left, lower → right
     top: '#dcedfa', // sky/top-edge colour the mobile gradient fades to for this room
@@ -78,24 +78,35 @@ const pad = (n: number) => String(n).padStart(4, '0');
     </a>
   </header>
 
+  <!-- Solid "BRAVURA BUILDERS" logo — fixed & centred, rides over the sky intro and the
+       establishing house shot, then fades out as the camera pans toward the front door.
+       Opacity is driven from the scroll engine (desktop only; hidden on portrait). -->
+  <div class="hero-logo" id="heroLogo" aria-hidden="true"><span class="hl-bravura">Bravura</span><span class="hl-builders">Builders</span></div>
+  <!-- Just a hair of corner-rounding: tiny blur of the glyph alpha, re-thresholded so the
+       sharp corners come back very slightly softened while the strokes stay crisp. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <filter id="softround"><feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -14"/></filter>
+  </defs></svg>
+  <div class="scroll-cue" id="scrollCue" aria-hidden="true">
+    <span>Scroll to walk through</span>
+    <span class="scroll-arrow"><span class="scroll-arrow-dot"></span></span>
+    <span class="scroll-chevron"></span>
+  </div>
+
   <main>
-    <!-- INTRO -->
-    <section class="intro">
-      <div class="intro-inner">
-        <span class="eyebrow">Bravura Builders · Metro Atlanta</span>
-        <h1>
-          Where the everyday<br /><em>becomes extraordinary.</em>
-        </h1>
-        <p class="lead">
-          Kitchens, baths, and the hardworking rooms in between — reimagined and
-          rebuilt by a general contractor who treats craftsmanship as the whole point.
-        </p>
-      </div>
-      <div class="scroll-cue" aria-hidden="true">
-        <span>Scroll to walk through</span>
-        <span class="scroll-arrow"><span class="scroll-arrow-dot"></span></span>
-        <span class="scroll-chevron"></span>
-      </div>
+    <!-- INTRO — a full-height sky-gradient panel with soft procedural clouds; the fixed logo
+         sits over it, then the journey scrolls up underneath (panning down from the sky). -->
+    <section class="intro" aria-hidden="true">
+      <svg class="clouds" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="cloudFilter" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.0075 0.013" numOctaves="5" seed="14" stitchTiles="stitch" result="noise"/>
+            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.4 0 0 0 -0.64"/>
+          </filter>
+        </defs>
+        <rect width="100%" height="100%" filter="url(#cloudFilter)"/>
+      </svg>
     </section>
 
     <!-- SCROLL JOURNEY (image-sequence scrub) -->
@@ -197,6 +208,18 @@ const pad = (n: number) => String(n).padStart(4, '0');
   const N_ROOMS = ROOMS.length;
   const pad = (n) => String(n).padStart(4, '0');
 
+  // Per-room scroll weighting: the exterior is now ~2× the footage (arrival + living-room pan),
+  // so it gets ~2× the scroll length to keep the pace consistent with the interior rooms.
+  const ROOM_WEIGHTS = ROOMS.map((r, i) => (i === 0 ? 2 : 1));
+  const WSUM = ROOM_WEIGHTS.reduce((a, b) => a + b, 0);
+  const WCUM = []; { let a = 0; for (const w of ROOM_WEIGHTS) { WCUM.push(a); a += w; } }
+  function progressToCur(p) {
+    let x = p * WSUM, room = 0;
+    while (room < N_ROOMS - 1 && x >= WCUM[room] + ROOM_WEIGHTS[room]) room++;
+    const local = (x - WCUM[room]) / ROOM_WEIGHTS[room];
+    return room + Math.max(0, Math.min(1, local));
+  }
+
   const canvas = document.getElementById('frameCanvas');
   const journey = document.getElementById('journey');
   const inner = journey ? journey.querySelector('.journey-inner') : null;
@@ -204,6 +227,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
   const loaderFill = document.getElementById('loaderFill');
   const captions = Array.from(document.querySelectorAll('.caption'));
   const dots = Array.from(document.querySelectorAll('.progress-dot'));
+  const scrollCue = document.getElementById('scrollCue');
+  const rail = document.querySelector('.progress-rail');
 
   // Fade the centered logo out once the journey is behind us.
   const nav = document.querySelector('.nav');
@@ -350,6 +375,16 @@ const pad = (n: number) => String(n).padStart(4, '0');
     let cur = 0, prevCur = 0, running = false, needsDraw = true, lastSig = '', lastT = 0;
     let skyTop = null; // captured once: the exterior's opening sky colour, held constant (mobile gradient)
 
+    // ---- desktop intro: a SOLID "BRAVURA BUILDERS" logo (fixed & centred, DOM element) rides
+    //      over the sky section and down onto the establishing house shot, then fades out as the
+    //      camera pans toward the front door. All fade/hold timing is by exterior `local`.
+    const heroLogo = document.getElementById('heroLogo');
+    const EST = 0.07;       // establishing hold: full house held, logo solid
+    const EST_DRIFT = 0.03; // barely drift through the first few frames during the hold
+    const DOOR = 0.48;      // logo fully faded out (a bit before the front door)
+    let skySampled = false; // once true, --sky-top matches the first frame's sky (seamless seam)
+    let skyArr = null;      // [r,g,b] of that sky, for the canvas-top blend
+
     function render() {
       const maxRoom = N_ROOMS - 1;
       let room = Math.min(maxRoom, Math.max(0, Math.floor(cur)));
@@ -361,13 +396,14 @@ const pad = (n: number) => String(n).padStart(4, '0');
       // hold the last frame and keep pushing in (digital zoom) to extend the reveal.
       let ff, zoom = 1;
       if (room === 0) {
-        const HOLD = 0.72;
-        if (local <= HOLD) {
-          const p = local / HOLD;
-          ff = (1 - Math.pow(1 - p, 1.8)) * (N - 1); // ease-out: slow as we reach the door
+        // Hold the establishing shot (whole house, barely drifting) while the logo is up, then
+        // play straight through the original clip to the door — no digital zoom (it caused lag).
+        if (!portrait && local <= EST) {
+          ff = (local / EST) * EST_DRIFT * (N - 1);
         } else {
-          ff = N - 1;
-          zoom = 1 + ((local - HOLD) / (1 - HOLD)) * 0.22; // continue into the living room
+          const s = portrait ? 0 : EST, d = portrait ? 0 : EST_DRIFT;
+          const p = (local - s) / (1 - s);
+          ff = (d + (1 - d) * p) * (N - 1);
         }
       } else {
         ff = local * (N - 1);
@@ -382,6 +418,18 @@ const pad = (n: number) => String(n).padStart(4, '0');
       kickRoom(room); kickRoom(room + 1); if (local < 0.2) kickRoom(room - 1);
       decodeWindow(room, i, cur - prevCur >= 0 ? 1 : -1);
       if (nextAlpha > 0) { ensure(room + 1, 0); ensure(room + 1, 1); }
+
+      // desktop intro logo: solid while the establishing shot holds, then fades out ~by the door.
+      // (Applied to DOM here, before the canvas early-return, so it tracks scroll every frame.)
+      let logoOp = 0;
+      if (!portrait && room === 0) {
+        logoOp = local <= EST ? 1 : 1 - (local - EST) / (DOOR - EST);
+        logoOp = Math.max(0, Math.min(1, logoOp));
+      }
+      if (heroLogo) heroLogo.style.opacity = logoOp.toFixed(3);
+      if (scrollCue) scrollCue.style.opacity = logoOp.toFixed(3);
+      if (nav) nav.style.opacity = (!portrait && room === 0) ? (1 - logoOp).toFixed(3) : '';
+      if (rail) rail.style.opacity = (!portrait && room === 0) ? (1 - logoOp).toFixed(3) : '';
 
       const sig = room + ':' + i + ':' + f.toFixed(3) + ':' + nextAlpha.toFixed(3) + ':' + zoom.toFixed(3);
       if (sig === lastSig && !needsDraw) return;
@@ -400,6 +448,30 @@ const pad = (n: number) => String(n).padStart(4, '0');
         const nr = frameOrNearest(room + 1, 0);
         if (nr) { ctx.globalAlpha = nextAlpha; drawCover(nr, view[room + 1].focusX, portrait); ctx.globalAlpha = 1; }
       }
+      // Sample the establishing frame's top sky pixel once and feed it to the intro gradient's
+      // bottom stop (--sky-top), so the seam where the sky panel meets the first frame blends
+      // perfectly (sky-on-sky, no visible line).
+      if (!portrait && room === 0 && !skySampled && local < 0.04) {
+        const sp = ctx.getImageData(canvas.width >> 1, 2, 1, 1).data;
+        if (sp[3] > 0) {
+          skySampled = true;
+          skyArr = [sp[0], sp[1], sp[2]];
+          document.documentElement.style.setProperty('--sky-top', `rgb(${sp[0]},${sp[1]},${sp[2]})`);
+        }
+      }
+      // Blend the canvas's very top to the flat sky colour (matching the intro panel's bottom) so
+      // the seam is perfect even though the photo's sky varies across the width; fades as we pan up.
+      if (!portrait && room === 0 && skyArr) {
+        const fade = local <= EST ? 1 : Math.max(0, 1 - (local - EST) / 0.06);
+        if (fade > 0) {
+          const h = Math.round(canvas.height * 0.14);
+          const g = ctx.createLinearGradient(0, 0, 0, h);
+          g.addColorStop(0, `rgba(${skyArr[0]},${skyArr[1]},${skyArr[2]},${fade})`);
+          g.addColorStop(1, `rgba(${skyArr[0]},${skyArr[1]},${skyArr[2]},0)`);
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, canvas.width, h);
+        }
+      }
       // portrait: fill the area above the bottom image band with a gradient from the
       // theme navy down to the image's own top-edge colour — so the space reads as
       // sky/ceiling and shifts to match whichever room is on screen.
@@ -417,8 +489,14 @@ const pad = (n: number) => String(n).padStart(4, '0');
           // cross-dissolves in, so it hands off cleanly to the next room.
           if (skyTop === null && local < 0.1) skyTop = [s[0], s[1], s[2]];
           const base = skyTop || [s[0], s[1], s[2]];
-          const sky = nextAlpha > 0 ? mix(base, [s[0], s[1], s[2]], nextAlpha) : base;
-          const overlap = Math.round(canvas.height * 0.05 * (1 - nextAlpha)) + 1;
+          const live = [s[0], s[1], s[2]];
+          // Hold the sky during the outdoor approach; once we pass the doorway into the living
+          // room, ease to the live ceiling colour (like the interior rooms). Also blend on the
+          // kitchen cross-dissolve.
+          const indoor = Math.max(0, Math.min(1, (local - 0.46) / 0.14));
+          let sky = mix(base, live, indoor);
+          if (nextAlpha > 0) sky = mix(sky, live, nextAlpha);
+          const overlap = Math.round(canvas.height * 0.05 * (1 - nextAlpha) * (1 - indoor)) + 1;
           const g = ctx.createLinearGradient(0, 0, 0, bandTop + overlap);
           g.addColorStop(0, '#081a28');
           g.addColorStop(bandTop / (bandTop + overlap), `rgb(${sky[0]},${sky[1]},${sky[2]})`);
@@ -436,7 +514,7 @@ const pad = (n: number) => String(n).padStart(4, '0');
       }
       // (The last frame stays crisp; the section below fades up into it — see the
       //  .manifesto top gradient in CSS — so the image is never dissolved to a flat colour.)
-      updateCaptions(room, local, nextAlpha);
+      updateCaptions(room, local, nextAlpha, logoOp);
       updateDots(cur);
     }
 
@@ -447,7 +525,7 @@ const pad = (n: number) => String(n).padStart(4, '0');
       // Lenis already smooths the scroll position with momentum, so the canvas
       // tracks it directly (no second easing pass, which would add lag).
       prevCur = cur;
-      cur = scrollProgress() * N_ROOMS;
+      cur = progressToCur(scrollProgress());
       render();
       requestAnimationFrame(tick);
     }
@@ -458,12 +536,13 @@ const pad = (n: number) => String(n).padStart(4, '0');
       if (local > OUT) return Math.max(0, 1 - (local - OUT) / (1 - OUT));
       return 1;
     }
-    function updateCaptions(room, local, nextAlpha) {
+    function updateCaptions(room, local, nextAlpha, mo) {
+      mo = mo || 0;
       captions.forEach((el, idx) => {
         let op = 0, y = 24;
         if (idx === room) {
           const c = captionOpacity(local, room === 0);
-          op = c * (1 - nextAlpha * 0.6);
+          op = c * (1 - nextAlpha * 0.6) * (1 - mo); // hold room-0 caption until the wordmark clears
           y = (1 - c) * 24;
         }
         el.style.opacity = op.toFixed(3);
@@ -574,49 +653,69 @@ const pad = (n: number) => String(n).padStart(4, '0');
   /* ---------- Intro ---------- */
   .intro {
     position: relative;
-    /* not full-height: the top ~18% of the first frame already shows below it,
-       so the walkthrough is peeking before you scroll */
-    min-height: 82svh;
-    display: grid;
-    place-items: center;
+    overflow: hidden;
+    height: 100svh;
+    /* Full sky gradient — a little deeper blue at the top (not dark), easing to the first frame's
+       ACTUAL sky pixel (--sky-top, sampled from the canvas) and holding it flat over the bottom
+       fifth, so the seam where the panel meets the establishing shot is an invisible sky-on-sky blend. */
+    background: linear-gradient(180deg, #b8d5ef 0%, #cfe4f6 42%, var(--sky-top, #dcedfa) 80%, var(--sky-top, #dcedfa) 100%);
+  }
+  /* Soft procedural clouds in the upper sky; faded out before the bottom so the seam stays clear. */
+  .clouds {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: 0.82;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, #000 16%, #000 52%, transparent 80%);
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, #000 16%, #000 52%, transparent 80%);
+  }
+  /* The centred wordmark that rides over the sky + establishing shot, then fades.
+     Each word clips its own background to its text so they can differ. */
+  .hero-logo {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    display: flex; flex-direction: column; align-items: center;
+    line-height: 0.92;
     text-align: center;
-    padding: 4rem 1.25rem 6rem;
-    color: #fff;
-    /* Dark navy up top for the text, gradually blending to the color of the
-       exterior's daytime sky (#dcedfa) so the scroll into the walkthrough is
-       seamless — a continuation of the sky, with no image shown in the panel. */
-    background:
-      radial-gradient(1100px 520px at 50% -12%, rgba(25,79,110,0.42), transparent 60%),
-      linear-gradient(180deg, var(--cine-bg) 0%, var(--cine-bg) 30%, #33465a 50%, #7f9bbd 74%, #bcd6f2 90%, #dcedfa 100%);
+    font-family: 'Inter', system-ui, sans-serif; /* sharp, geometric corners */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    font-size: 16.5vw;
+    /* glass sits above the scene: a tight contact shadow + soft ambient for depth */
+    filter: url(#softround) drop-shadow(0 1px 1px rgba(10,25,45,0.4)) drop-shadow(0 10px 22px rgba(10,25,45,0.2));
+    pointer-events: none;
+    will-change: opacity;
   }
-  .intro-inner { max-width: 780px; position: relative; z-index: 2; }
-  .intro .eyebrow { color: var(--highlight); }
-  .intro h1 {
-    color: #fff;
-    font-size: clamp(2.4rem, 6.5vw, 4.6rem);
-    line-height: 1.04;
-    margin-bottom: 1.25rem;
+  /* Translucent, glossy "liquid glass": a strong bright highlight across the top and a softer
+     reflection near the bottom, with a clear translucent body between — so the scene behind
+     shows through and tints the letters (adapting as you scroll). No outline, for a clean glass edge. */
+  .hero-logo span {
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
   }
-  .intro h1 em { font-style: italic; color: var(--highlight); }
-  .intro .lead {
-    color: rgba(255,255,255,0.72);
-    font-size: clamp(1.05rem, 1.7vw, 1.25rem);
-    max-width: 560px; margin: 0 auto 3rem;
-  }
+  /* BRAVURA — solid white. */
+  .hl-bravura { background: #ffffff; }
+  /* BUILDERS — solid white. */
+  .hl-builders { background: #ffffff; }
+  :global(html.is-portrait) .hero-logo { display: none; }
   .scroll-cue {
-    position: absolute;
-    left: 50%; bottom: 1.6rem;
+    position: fixed;
+    left: 50%; bottom: 1.8rem;
     transform: translateX(-50%);
-    z-index: 3;
+    z-index: 30;
     display: inline-flex; flex-direction: column; align-items: center; gap: 0.9rem;
-    /* sits over the warm cream bottom of the panel, so it's dark for contrast */
-    color: rgba(10,28,42,0.8);
+    /* sits over the light sky-coloured wordmark panel during the intro, so it's dark for contrast */
+    color: rgba(10,28,42,0.72);
     font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
-    text-shadow: 0 1px 10px rgba(255,255,255,0.35);
+    text-shadow: 0 1px 12px rgba(255,255,255,0.4);
+    pointer-events: none;
   }
+  :global(html.is-portrait) .scroll-cue { display: none; }
   .scroll-arrow {
     width: 1.5px; height: 58px;
-    background: linear-gradient(rgba(10,28,42,0.12), rgba(10,28,42,0.55));
+    background: linear-gradient(rgba(10,28,42,0.12), rgba(10,28,42,0.5));
     position: relative; overflow: hidden; border-radius: 2px;
   }
   /* a lit dot travels down the line, "pulling" the eye into the image */
@@ -646,8 +745,10 @@ const pad = (n: number) => String(n).padStart(4, '0');
   }
 
   /* ---------- Journey (scrub) ---------- */
-  .journey { position: relative; background: var(--cine-bg); }
-  .journey-inner { position: relative; height: 880vh; } /* 4 rooms × ~220vh */
+  /* Pulled up 2px so the canvas overlaps the intro's bottom edge — kills the sub-pixel gap that
+     would otherwise flash the dark background as a hairline seam during smooth scrolling. */
+  .journey { position: relative; background: var(--cine-bg); margin-top: -2px; }
+  .journey-inner { position: relative; height: 1100vh; } /* weighted: exterior 2×220 + 3 rooms ×220 */
   .journey-pin {
     position: sticky; top: 0;
     height: 100svh; height: 100dvh; /* dvh tracks the viewport as the mobile URL bar hides — no dark strip */
@@ -657,12 +758,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
 
   .scrim {
     position: absolute; inset: 0; pointer-events: none;
-    background:
-      /* top: a short sky-colored fade only over the sky above the roofline, so the
-         seam is invisible but the full roof stays visible (no fade over the house).
-         (No bottom darkening — the last frame's floor must stay true so the closing
-         section blends into it; captions rely on their own text-shadow.) */
-      linear-gradient(180deg, #dcedfa 0%, rgba(220,237,250,0) 6%);
+    /* (Formerly a top sky-fade for the intro→sky seam; the redesigned intro fills the
+       canvas from the top with no separate gradient above it, so no scrim is needed.) */
   }
 
   .caption-layer { position: absolute; inset: 0; pointer-events: none; }

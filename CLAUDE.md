@@ -45,8 +45,9 @@ glass doors into the house — the "arrival".
   dissolves that gradient softly into the image over a short transparent overlap — no colour
   drift, no hard seam — easing to the live colour + a hard join only as the kitchen
   cross-dissolves in. (`rooms[].top` is unused.)
-- **Seams (mirror bookends):** the intro blends from dark down to the exterior's **sky**
-  (`#dcedfa`) at the top. The bottom mirrors it: the last frame stays crisp (no overlay) and
+- **Seams:** the top no longer needs a sky-blend seam — the canvas fills from the top and the
+  exterior establishing shot (its own sky) opens the page under the wordmark knockout (the old
+  `.scrim` top sky-fade was removed). The bottom: the last frame stays crisp (no overlay) and
   the `.closing` wrapper (manifesto + contact) is a gradient starting at the **bedroom floor
   colour** (`#63503b`, top) fading down to `--cine-bg` at the page bottom — so the section
   blends into the bottom of the last frame. The canvas bottom scrim was removed so the
@@ -97,7 +98,7 @@ glass doors into the house — the "arrival".
 
 1. **Loader** — centered logo + progress bar; covers the page until the first exterior frames load
 2. **Nav** — fixed centered **text wordmark** ("Bravura" in Playfair + spaced "BUILDERS"; `.wordmark`), soft dark halo behind it; fades out past the journey. (The old `bravura-logo.png` is no longer used.)
-3. **Intro** (desktop only; hidden on portrait) — dark hero at `min-height: 82svh` (not full-height, so the top ~18% of the exterior already peeks below it before scrolling), blending down to the exterior's sky (`#dcedfa`); animated scroll cue
+3. **Intro** (desktop) — there is no separate intro section anymore. The journey canvas fills the screen from the top; room 0 opens on the exterior establishing shot with a big centred **solid-white "BRAVURA BUILDERS" wordmark** — a fixed DOM element (`.hero-logo` / `#heroLogo`, two `<span>`s clipped to Inter), not composited on the canvas. It holds solid through the establishing shot (`EST` ≈ 0.07 of room 0) then fades its opacity to 0 by the front door (`DOOR` ≈ 0.48); the same `logoOp` fades the "Scroll to walk through" cue in step and fades the nav wordmark + progress rail *in* as it clears. A subtle SVG filter (`#softround`: tiny `feGaussianBlur` + `feColorMatrix` alpha threshold) rounds the sharp Inter corners a hair while keeping strokes crisp. Desktop-only (`!portrait`); hidden on portrait phones. (Earlier iterations used a canvas knockout, then a translucent "liquid glass" gradient fill — both replaced by the current solid white.)
 4. **Journey** — the scroll-scrub canvas: Exterior → Kitchen → Bath → Bedroom, each with a caption (kicker / title / body) and a 4-dot progress rail
 5. **Stills** — reduced-motion / no-JS fallback (hidden when the scrub is active)
 6. **Manifesto** — the "bravura" definition + the written-scope / single-point-of-contact pitch
