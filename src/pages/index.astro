@@ -16,8 +16,8 @@ const address = '11720 Amber Park Dr, Alpharetta GA 30009';
 const rooms = [
   {
     id: 'exterior',
-    desktop: 443, // arrival (1-241) + seamless living-room push-in (Livingroom1, 242-443)
-    mobile: 443,
+    desktop: 222, // arrival + living-room push-in, decimated to every-other frame (was 443) for smooth decode on Safari; cross-dissolve keeps motion fluid
+    mobile: 222,
     exteriorBoth: true,
     focusX: 0.5, // image x-fraction held at screen center; raise → house shifts left, lower → right
     top: '#dcedfa', // sky/top-edge colour the mobile gradient fades to for this room
