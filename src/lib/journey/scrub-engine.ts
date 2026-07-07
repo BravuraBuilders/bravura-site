@@ -215,6 +215,11 @@ export function initJourney(rooms: RoomData[]): void {
   // display canvas (getImageData) makes Safari fall back to software rendering for the rest
   // of the session, which tanks scroll perf. Instead map the on-screen point back to the
   // source image and read it from a 1×1 offscreen canvas.
+  // The portrait gradients start from the theme navy — read it from the CSS
+  // token once so a brand change can't drift out of sync with the canvas.
+  const cineBg =
+    getComputedStyle(document.documentElement).getPropertyValue('--cine-bg').trim() || '#081a28';
+
   const sampler = document.createElement('canvas');
   sampler.width = sampler.height = 1;
   const sctx = sampler.getContext('2d', { willReadFrequently: true });
@@ -406,7 +411,7 @@ export function initJourney(rooms: RoomData[]): void {
         const overlap =
           Math.round(canvas.height * PORTRAIT_OVERLAP * (1 - nextAlpha) * (1 - indoor)) + 1;
         const g = ctx.createLinearGradient(0, 0, 0, bandTop + overlap);
-        g.addColorStop(0, '#081a28');
+        g.addColorStop(0, cineBg);
         g.addColorStop(bandTop / (bandTop + overlap), `rgb(${sky[0]},${sky[1]},${sky[2]})`);
         g.addColorStop(1, `rgba(${sky[0]},${sky[1]},${sky[2]},0)`);
         ctx.fillStyle = g;
@@ -414,7 +419,7 @@ export function initJourney(rooms: RoomData[]): void {
       } else {
         const bot = [s[0], s[1], s[2]]; // interior rooms: live sample, hard join (matches top, seamless)
         const g = ctx.createLinearGradient(0, 0, 0, bandTop + 1);
-        g.addColorStop(0, '#081a28');
+        g.addColorStop(0, cineBg);
         g.addColorStop(1, `rgb(${bot[0]},${bot[1]},${bot[2]})`);
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, canvas.width, bandTop + 1);
@@ -466,6 +471,11 @@ export function initJourney(rooms: RoomData[]): void {
         .filter((im): im is HTMLImageElement => Boolean(im))
         .map((im) => im.decode().catch(() => {})),
     );
+    const missing = imgs[0].slice(0, need).filter((im) => !im).length;
+    if (missing)
+      console.warn(
+        `[journey] ${missing}/${need} boot frames not ready — check /frames/desktop/${view[0].id}/`,
+      );
     if (loader) {
       loader.classList.add('is-done');
       setTimeout(() => loader.remove(), LOADER_REMOVE_MS);
