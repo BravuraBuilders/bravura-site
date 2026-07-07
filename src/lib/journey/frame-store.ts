@@ -10,6 +10,16 @@ export const pad = (n: number): string => String(n).padStart(4, '0');
 export const frameSrc = (id: string, i: number): string =>
   `/frames/desktop/${id}/frame_${pad(i + 1)}.jpg`;
 
+// Failed frames degrade gracefully (frameOrNearest draws a neighbour), which
+// also means failures are invisible — so say so once per URL where a dev
+// console will surface it.
+const warned = new Set<string>();
+function warnOnce(url: string): void {
+  if (warned.has(url)) return;
+  warned.add(url);
+  console.warn('[journey] frame failed to load:', url);
+}
+
 export function createFrameStore(view: ViewRoom[]) {
   const nRooms = view.length;
   const imgs: (HTMLImageElement | null)[][] = view.map((v) => new Array(v.count).fill(null));
@@ -23,9 +33,11 @@ export function createFrameStore(view: ViewRoom[]) {
     im.decoding = 'async';
     im.onload = () => {
       imgs[ri][i] = im.naturalWidth ? im : null;
+      if (!im.naturalWidth) warnOnce(im.src);
     };
     im.onerror = () => {
       imgs[ri][i] = null;
+      warnOnce(im.src);
     };
     im.src = frameSrc(view[ri].id, i);
   }
