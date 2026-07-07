@@ -1,0 +1,177 @@
+---
+// SCROLL JOURNEY (image-sequence scrub) — the engine (src/lib/journey) drives
+// #frameCanvas, the captions, and the progress dots. The ids/classes here are
+// its query surface; renaming them breaks the engine.
+import type { RoomData } from '../lib/journey/types';
+
+interface Props {
+  rooms: RoomData[];
+}
+const { rooms } = Astro.props;
+---
+
+<section class="journey" id="journey" aria-label="A walkthrough of four transformed spaces">
+  <div class="journey-inner">
+    <div class="journey-pin">
+      <canvas id="frameCanvas" class="frame-canvas"></canvas>
+      <div class="scrim" aria-hidden="true"></div>
+
+      <div class="caption-layer" aria-hidden="true">
+        {
+          rooms.map((r, i) => (
+            <div class="caption" data-room={i}>
+              <span class="caption-kicker">{r.kicker}</span>
+              <h2 class="caption-title">{r.title}</h2>
+              <p class="caption-body">{r.body}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="progress-rail" aria-hidden="true">
+        {rooms.map((r, i) => <span class="progress-dot" data-room={i} title={r.kicker} />)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Pulled up 2px so the canvas overlaps the intro's bottom edge — kills the sub-pixel gap that
+     would otherwise flash the dark background as a hairline seam during smooth scrolling. */
+  .journey {
+    position: relative;
+    background: var(--cine-bg);
+    margin-top: -2px;
+  }
+  .journey-inner {
+    position: relative;
+    height: 1100vh;
+  } /* weighted: exterior 2×220 + 3 rooms ×220 */
+  .journey-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    height: 100dvh; /* dvh tracks the viewport as the mobile URL bar hides — no dark strip */
+    width: 100%;
+    overflow: hidden;
+  }
+  .frame-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--cine-bg);
+  }
+
+  .scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* (Formerly a top sky-fade for the intro→sky seam; the redesigned intro fills the
+       canvas from the top with no separate gradient above it, so no scrim is needed.) */
+  }
+
+  .caption-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .caption {
+    position: absolute;
+    left: clamp(1.5rem, 6vw, 6rem);
+    bottom: clamp(3.5rem, 12vh, 8rem);
+    max-width: min(560px, 76vw);
+    color: #fff;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  .caption-kicker {
+    display: block;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--highlight);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  .caption-title {
+    color: #fff;
+    font-size: clamp(2rem, 5.2vw, 3.4rem);
+    line-height: 1.05;
+    margin: 0 0 0.8rem;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.55),
+      0 2px 30px rgba(0, 0, 0, 0.45);
+  }
+  .caption-body {
+    color: rgba(255, 255, 255, 0.86);
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    margin: 0;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.6),
+      0 1px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .progress-rail {
+    position: absolute;
+    right: clamp(1.1rem, 3vw, 2.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
+    transition:
+      background 0.3s ease,
+      transform 0.3s ease;
+  }
+  .progress-dot.is-active {
+    background: var(--highlight);
+    transform: scale(1.5);
+  }
+
+  /* When the scrub isn't active, hide the canvas journey (the stills show instead). */
+  :global(html.no-scrub) .journey {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .caption {
+      left: 1.25rem;
+      right: 1.25rem;
+      bottom: 4.5rem;
+    }
+  }
+
+  /* mobile draws its own per-room gradient above the band, so hide the CSS scrim */
+  :global(html.is-portrait) .scrim {
+    display: none;
+  }
+
+  /* the image band is anchored to the bottom of the screen, so the caption sits
+     directly above it and the progress dots move down out of it. */
+  :global(html.is-portrait) .caption {
+    left: 1.25rem;
+    right: 1.25rem;
+    top: 0;
+    bottom: var(--band-h, 40vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4.5rem 0 1.6rem; /* clear the logo up top, small gap above the band */
+  }
+  :global(html.is-portrait) .progress-rail {
+    top: auto;
+    bottom: 1.1rem;
+    left: 0;
+    right: 0;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.55rem;
+  }
+</style>

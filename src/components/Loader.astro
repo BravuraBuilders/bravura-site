@@ -1,0 +1,54 @@
+<!-- Covers the page until the first exterior frames load + decode (removed by the engine). -->
+<div id="loader" class="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <span class="wordmark wordmark--lg">
+      <span class="wordmark-name">Bravura</span>
+      <span class="wordmark-sub">Builders</span>
+    </span>
+    <div class="loader-bar"><span id="loaderFill" class="loader-fill"></span></div>
+    <p class="loader-label">Preparing the walkthrough…</p>
+  </div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: var(--cine-bg);
+    transition: opacity 0.6s ease;
+  }
+  .loader.is-done {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .loader-bar {
+    width: 220px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(184, 200, 224, 0.2);
+    overflow: hidden;
+  }
+  .loader-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--highlight);
+    transition: width 0.2s ease;
+  }
+  .loader-label {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+</style>
