@@ -73,15 +73,22 @@ export function initJourney(rooms: RoomData[]): void {
   const scrollCue = document.getElementById('scrollCue');
   const rail = document.querySelector<HTMLElement>('.progress-rail');
 
-  // Fade the centered logo out once the journey is behind us.
+  // Fade the centered logo out once the journey is behind us. The threshold is
+  // measured on layout changes only (offsetTop/offsetHeight force layout), so
+  // the per-scroll-tick work is a single scrollY read + an idempotent toggle.
   const nav = document.querySelector<HTMLElement>('.nav');
-  function updateNav(): void {
-    if (!nav || !journey) return;
-    const journeyBottom = journey.offsetTop + journey.offsetHeight;
-    nav.classList.toggle('nav--hidden', window.scrollY > journeyBottom - window.innerHeight * 0.5);
+  let navThreshold = Infinity;
+  function measureNav(): void {
+    if (!journey) return;
+    navThreshold = journey.offsetTop + journey.offsetHeight - window.innerHeight * 0.5;
   }
-  window.addEventListener('scroll', updateNav, { passive: true });
+  function updateNav(): void {
+    if (!nav) return;
+    nav.classList.toggle('nav--hidden', window.scrollY > navThreshold);
+  }
+  measureNav();
   updateNav();
+  window.addEventListener('scroll', updateNav, { passive: true });
 
   const prefersReduced =
     window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -90,6 +97,11 @@ export function initJourney(rooms: RoomData[]): void {
   if (prefersReduced || !canvas || !ctx) {
     document.documentElement.classList.add('no-scrub');
     if (loader) loader.remove();
+    // no scrub rAF loop in this path, so re-measure on viewport changes here
+    window.addEventListener('resize', () => {
+      measureNav();
+      updateNav();
+    });
     return;
   }
   document.documentElement.classList.add('has-scrub');
@@ -475,6 +487,8 @@ export function initJourney(rooms: RoomData[]): void {
   function onViewportChange(): void {
     buildView(); // same frames in both orientations; only the fit (cover/contain) changes
     resize(); // sets needsDraw
+    measureNav();
+    updateNav();
   }
   let resizeTimer: ReturnType<typeof setTimeout>;
   window.addEventListener('resize', () => {
