@@ -13,7 +13,11 @@ const { rooms } = Astro.props;
 <section class="journey" id="journey" aria-label="A walkthrough of four transformed spaces">
   <div class="journey-inner">
     <div class="journey-pin">
-      <canvas id="frameCanvas" class="frame-canvas"></canvas>
+      <canvas
+        id="frameCanvas"
+        class="frame-canvas"
+        role="img"
+        aria-label="Cinematic walkthrough of a Bravura Builders home: exterior arrival, kitchen, bathroom, and bedroom"></canvas>
       <div class="scrim" aria-hidden="true"></div>
 
       <div class="caption-layer" aria-hidden="true">
