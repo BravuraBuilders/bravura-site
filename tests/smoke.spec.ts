@@ -38,7 +38,7 @@ async function scrollToProgress(page: Page, p: number) {
 
 const captionOpacities = (page: Page) =>
   page.evaluate(() =>
-    [...document.querySelectorAll('.caption')].map((c) => Number(getComputedStyle(c).opacity))
+    [...document.querySelectorAll('.caption')].map((c) => Number(getComputedStyle(c).opacity)),
   );
 
 test.describe('scrub journey', () => {
@@ -54,7 +54,7 @@ test.describe('scrub journey', () => {
         Math.floor(canvas.width / 2),
         Math.floor(canvas.height * 0.7),
         1,
-        1
+        1,
       );
       // navy --cine-bg is (8, 26, 40); a painted frame differs substantially
       return Math.abs(data[0] - 8) + Math.abs(data[1] - 26) + Math.abs(data[2] - 40) > 30;
@@ -74,8 +74,8 @@ test.describe('scrub journey', () => {
       });
       const activeDot = await page.evaluate(() =>
         [...document.querySelectorAll('.progress-dot')].findIndex((d) =>
-          d.classList.contains('is-active')
-        )
+          d.classList.contains('is-active'),
+        ),
       );
       expect(activeDot).toBe(room);
     }
@@ -99,11 +99,10 @@ test.describe('scrub journey', () => {
     await waitForBoot(page);
     await expect(page.locator('html')).toHaveClass(/is-portrait/);
     const bandH = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--band-h')
+      getComputedStyle(document.documentElement).getPropertyValue('--band-h'),
     );
     expect(bandH.trim()).toMatch(/px$/);
     const ops = await captionOpacities(page);
     expect(ops[0], 'first caption visible from scroll 0 on portrait').toBeGreaterThan(0.5);
   });
 });
-

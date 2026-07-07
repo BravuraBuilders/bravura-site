@@ -79,13 +79,20 @@ const pad = (n: number) => String(n).padStart(4, '0');
   <!-- Solid "BRAVURA BUILDERS" logo — fixed & centred, rides over the sky intro and the
        establishing house shot, then fades out as the camera pans toward the front door.
        Opacity is driven from the scroll engine (desktop only; hidden on portrait). -->
-  <div class="hero-logo" id="heroLogo" aria-hidden="true"><span class="hl-bravura">Bravura</span><span class="hl-builders">Builders</span></div>
+  <div class="hero-logo" id="heroLogo" aria-hidden="true">
+    <span class="hl-bravura">Bravura</span><span class="hl-builders">Builders</span>
+  </div>
   <!-- Just a hair of corner-rounding: tiny blur of the glyph alpha, re-thresholded so the
        sharp corners come back very slightly softened while the strokes stay crisp. -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-    <filter id="softround"><feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"/>
-      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -14"/></filter>
-  </defs></svg>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"
+    ><defs>
+      <filter id="softround"
+        ><feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"></feGaussianBlur>
+        <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -14"
+        ></feColorMatrix></filter
+      >
+    </defs></svg
+  >
   <div class="scroll-cue" id="scrollCue" aria-hidden="true">
     <span>Scroll to walk through</span>
     <span class="scroll-arrow"><span class="scroll-arrow-dot"></span></span>
@@ -96,14 +103,28 @@ const pad = (n: number) => String(n).padStart(4, '0');
     <!-- INTRO — a full-height sky-gradient panel with soft procedural clouds; the fixed logo
          sits over it, then the journey scrolls up underneath (panning down from the sky). -->
     <section class="intro" aria-hidden="true">
-      <svg class="clouds" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+      <svg
+        class="clouds"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
         <defs>
           <filter id="cloudFilter" x="0" y="0" width="100%" height="100%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.0075 0.013" numOctaves="5" seed="14" stitchTiles="stitch" result="noise"/>
-            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.4 0 0 0 -0.64"/>
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.0075 0.013"
+              numOctaves="5"
+              seed="14"
+              stitchTiles="stitch"
+              result="noise"></feTurbulence>
+            <feColorMatrix
+              in="noise"
+              type="matrix"
+              values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.4 0 0 0 -0.64"></feColorMatrix>
           </filter>
         </defs>
-        <rect width="100%" height="100%" filter="url(#cloudFilter)"/>
+        <rect width="100%" height="100%" filter="url(#cloudFilter)"></rect>
       </svg>
     </section>
 
@@ -115,19 +136,19 @@ const pad = (n: number) => String(n).padStart(4, '0');
           <div class="scrim" aria-hidden="true"></div>
 
           <div class="caption-layer" aria-hidden="true">
-            {rooms.map((r, i) => (
-              <div class="caption" data-room={i}>
-                <span class="caption-kicker">{r.kicker}</span>
-                <h2 class="caption-title">{r.title}</h2>
-                <p class="caption-body">{r.body}</p>
-              </div>
-            ))}
+            {
+              rooms.map((r, i) => (
+                <div class="caption" data-room={i}>
+                  <span class="caption-kicker">{r.kicker}</span>
+                  <h2 class="caption-title">{r.title}</h2>
+                  <p class="caption-body">{r.body}</p>
+                </div>
+              ))
+            }
           </div>
 
           <div class="progress-rail" aria-hidden="true">
-            {rooms.map((r, i) => (
-              <span class="progress-dot" data-room={i} title={r.kicker}></span>
-            ))}
+            {rooms.map((r, i) => <span class="progress-dot" data-room={i} title={r.kicker} />)}
           </div>
         </div>
       </div>
@@ -135,58 +156,60 @@ const pad = (n: number) => String(n).padStart(4, '0');
 
     <!-- REDUCED-MOTION / NO-JS STILL FALLBACK -->
     <section class="stills" aria-label="Selected spaces">
-      {rooms.map((r) => (
-        <figure class="still">
-          <img
-            src={`/frames/desktop/${r.id}/frame_${pad(r.desktop)}.jpg`}
-            alt={`${r.kicker} by Bravura Builders`}
-            loading="lazy"
-            decoding="async"
-          />
-          <figcaption>
-            <span class="caption-kicker">{r.kicker}</span>
-            <strong>{r.title}</strong>
-            <span>{r.body}</span>
-          </figcaption>
-        </figure>
-      ))}
+      {
+        rooms.map((r) => (
+          <figure class="still">
+            <img
+              src={`/frames/desktop/${r.id}/frame_${pad(r.desktop)}.jpg`}
+              alt={`${r.kicker} by Bravura Builders`}
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>
+              <span class="caption-kicker">{r.kicker}</span>
+              <strong>{r.title}</strong>
+              <span>{r.body}</span>
+            </figcaption>
+          </figure>
+        ))
+      }
     </section>
 
     <!-- CLOSING: light floor colour at the top (blends into the bedroom's bottom)
          fading down to the dark theme by the page bottom — the mirror of the sky. -->
     <div class="closing">
-    <!-- MANIFESTO -->
-    <section class="manifesto">
-      <div class="wrap manifesto-inner">
-        <p class="dict">
-          bra·vu·ra <span>/brəˈvyoo-rə/</span> — <em>noun.</em> great technical skill
-          and brilliance shown in a performance.
-        </p>
-        <p class="manifesto-body">
-          We put that skill into the rooms you actually live in. Every Bravura project
-          runs on a written scope, a defined schedule, and a single point of contact —
-          so you always know what comes next and exactly what it costs.
-        </p>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section class="contact" id="contact">
-      <div class="wrap contact-inner">
-        <span class="eyebrow">Start a conversation</span>
-        <h2>Ready to transform your space?</h2>
-        <p>
-          Reach out for a free quote. We'll talk through scope, budget, and timeline —
-          and if design or renderings are the right first step, we'll quote that
-          separately before any construction bid.
-        </p>
-        <div class="cta-row">
-          <a href={phoneHref} class="glass-btn">Call</a>
-          <a href={smsHref} class="glass-btn">Text</a>
-          <a href={emailHref} class="glass-btn">Email us</a>
+      <!-- MANIFESTO -->
+      <section class="manifesto">
+        <div class="wrap manifesto-inner">
+          <p class="dict">
+            bra·vu·ra <span>/brəˈvyoo-rə/</span> — <em>noun.</em> great technical skill and brilliance
+            shown in a performance.
+          </p>
+          <p class="manifesto-body">
+            We put that skill into the rooms you actually live in. Every Bravura project runs on a
+            written scope, a defined schedule, and a single point of contact — so you always know
+            what comes next and exactly what it costs.
+          </p>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="contact" id="contact">
+        <div class="wrap contact-inner">
+          <span class="eyebrow">Start a conversation</span>
+          <h2>Ready to transform your space?</h2>
+          <p>
+            Reach out for a free quote. We'll talk through scope, budget, and timeline — and if
+            design or renderings are the right first step, we'll quote that separately before any
+            construction bid.
+          </p>
+          <div class="cta-row">
+            <a href={phoneHref} class="glass-btn">Call</a>
+            <a href={smsHref} class="glass-btn">Text</a>
+            <a href={emailHref} class="glass-btn">Email us</a>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -198,7 +221,7 @@ const pad = (n: number) => String(n).padStart(4, '0');
   </footer>
 </Layout>
 
-<script id="rooms-data" type="application/json" is:inline set:html={JSON.stringify(rooms)}></script>
+<script id="rooms-data" type="application/json" is:inline set:html={JSON.stringify(rooms)} />
 
 <script>
   import Lenis from 'lenis';
@@ -210,7 +233,14 @@ const pad = (n: number) => String(n).padStart(4, '0');
   // so it gets ~2× the scroll length to keep the pace consistent with the interior rooms.
   const ROOM_WEIGHTS = ROOMS.map((r, i) => (i === 0 ? 2 : 1));
   const WSUM = ROOM_WEIGHTS.reduce((a, b) => a + b, 0);
-  const WCUM = []; { let a = 0; for (const w of ROOM_WEIGHTS) { WCUM.push(a); a += w; } }
+  const WCUM = [];
+  {
+    let a = 0;
+    for (const w of ROOM_WEIGHTS) {
+      WCUM.push(a);
+      a += w;
+    }
+  }
   function progressToCur(p) {
     const x = p * WSUM;
     let room = 0;
@@ -255,11 +285,23 @@ const pad = (n: number) => String(n).padStart(4, '0');
     // don't crop the sides — we fit the full frame to the width and letterbox
     // (contain); on landscape we fill the screen (cover).
     let portrait, view;
-    const hexToRgb = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-    const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t].map((v) => Math.round(v));
+    const hexToRgb = (h) => [
+      parseInt(h.slice(1, 3), 16),
+      parseInt(h.slice(3, 5), 16),
+      parseInt(h.slice(5, 7), 16),
+    ];
+    const mix = (a, b, t) =>
+      [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t].map((v) =>
+        Math.round(v),
+      );
     function buildView() {
       portrait = window.innerHeight > window.innerWidth;
-      view = ROOMS.map((r) => ({ id: r.id, count: r.desktop, focusX: r.focusX, top: hexToRgb(r.top || '#3a4a55') }));
+      view = ROOMS.map((r) => ({
+        id: r.id,
+        count: r.desktop,
+        focusX: r.focusX,
+        top: hexToRgb(r.top || '#3a4a55'),
+      }));
     }
     buildView();
     const src = (ri, i) => `/frames/desktop/${view[ri].id}/frame_${pad(i + 1)}.jpg`;
@@ -281,8 +323,12 @@ const pad = (n: number) => String(n).padStart(4, '0');
       started[ri][i] = true;
       const im = new Image();
       im.decoding = 'async';
-      im.onload = () => { imgs[ri][i] = im.naturalWidth ? im : null; };
-      im.onerror = () => { imgs[ri][i] = null; };
+      im.onload = () => {
+        imgs[ri][i] = im.naturalWidth ? im : null;
+      };
+      im.onerror = () => {
+        imgs[ri][i] = null;
+      };
       im.src = src(ri, i);
     }
     // Load only a bounded window of frames around the playhead (biased in the scroll
@@ -292,7 +338,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
     function loadWindow(ri, i, dir) {
       if (ri < 0 || ri >= N_ROOMS) return;
       const cnt = view[ri].count;
-      const ahead = dir >= 0 ? 70 : 25, behind = dir >= 0 ? 25 : 70;
+      const ahead = dir >= 0 ? 70 : 25,
+        behind = dir >= 0 ? 25 : 70;
       for (let f = Math.max(0, i - behind); f <= Math.min(cnt - 1, i + ahead); f++) ensure(ri, f);
     }
 
@@ -311,31 +358,42 @@ const pad = (n: number) => String(n).padStart(4, '0');
     // they're ready to draw with no synchronous decode. Prune far frames so
     // they can be re-decoded if the user scrolls back to them later.
     function decodeWindow(ri, i, dir) {
-      const cnt = view[ri].count, set = decodeReq[ri];
-      const ahead = dir >= 0 ? 22 : 8, behind = dir >= 0 ? 8 : 22;
+      const cnt = view[ri].count,
+        set = decodeReq[ri];
+      const ahead = dir >= 0 ? 22 : 8,
+        behind = dir >= 0 ? 8 : 22;
       for (let f = Math.max(0, i - behind); f <= Math.min(cnt - 1, i + ahead); f++) {
         const im = imgs[ri][f];
-        if (im && !set.has(f) && im.decode) { set.add(f); im.decode().catch(() => {}); }
+        if (im && !set.has(f) && im.decode) {
+          set.add(f);
+          im.decode().catch(() => {});
+        }
       }
       for (const f of set) if (f < i - 70 || f > i + 70) set.delete(f);
     }
 
     // ---- canvas sizing -----------------------------------------------------
-    let vw = 0, vh = 0, dpr = 1;
+    let vw = 0,
+      vh = 0,
+      dpr = 1;
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      vw = window.innerWidth; vh = window.innerHeight;
-      canvas.width = Math.round(vw * dpr); canvas.height = Math.round(vh * dpr);
+      vw = window.innerWidth;
+      vh = window.innerHeight;
+      canvas.width = Math.round(vw * dpr);
+      canvas.height = Math.round(vh * dpr);
       // Let CSS size the canvas to fill the pin (100dvh) so it tracks the viewport as the
       // mobile URL bar hides/shows — no dark strip, no manual pixel sizing to fight it.
-      canvas.style.width = '100%'; canvas.style.height = '100%';
-      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'medium';
       // portrait: image band is anchored to the bottom; publish its height so the
       // caption can sit directly above it (no floating empty bands).
       const root = document.documentElement;
       if (portrait) {
         root.classList.add('is-portrait');
-        root.style.setProperty('--band-h', (vh * MOBILE_BAND) + 'px');
+        root.style.setProperty('--band-h', vh * MOBILE_BAND + 'px');
       } else {
         root.classList.remove('is-portrait');
       }
@@ -344,23 +402,37 @@ const pad = (n: number) => String(n).padStart(4, '0');
     function drawCover(img, fx, contain, zoom) {
       if (!img) return;
       zoom = zoom || 1;
-      const cw = canvas.width, ch = canvas.height;
+      const cw = canvas.width,
+        ch = canvas.height;
       const ir = img.naturalWidth / img.naturalHeight;
       let dw, dh, ox, oy;
       if (contain) {
         // fill the bottom ~half of the screen: cover a bottom band region, cropping
         // the sides moderately (keeps the centre of each shot). Caption sits above.
         const bandH = ch * MOBILE_BAND;
-        if (cw / bandH > ir) { dw = cw; dh = cw / ir; }
-        else { dh = bandH; dw = bandH * ir; }
-        dw *= zoom; dh *= zoom;
+        if (cw / bandH > ir) {
+          dw = cw;
+          dh = cw / ir;
+        } else {
+          dh = bandH;
+          dw = bandH * ir;
+        }
+        dw *= zoom;
+        dh *= zoom;
         ox = (cw - dw) / 2;
         oy = ch - bandH + (bandH - dh) / 2; // zoom toward the band centre (overflow hidden by the top gradient)
       } else {
         // cover: fill the screen, holding the focus point at centre (clamped)
         const cr = cw / ch;
-        if (cr > ir) { dw = cw; dh = cw / ir; } else { dh = ch; dw = ch * ir; }
-        dw *= zoom; dh *= zoom;
+        if (cr > ir) {
+          dw = cw;
+          dh = cw / ir;
+        } else {
+          dh = ch;
+          dw = ch * ir;
+        }
+        dw *= zoom;
+        dh *= zoom;
         fx = fx == null ? 0.5 : fx;
         ox = Math.min(0, Math.max(cw - dw, cw * 0.5 - fx * dw));
         oy = Math.min(0, Math.max(ch - dh, (ch - dh) / 2));
@@ -378,8 +450,14 @@ const pad = (n: number) => String(n).padStart(4, '0');
     const sctx = sampler.getContext('2d', { willReadFrequently: true });
     function sampleAt(img, geom, cx, cy) {
       if (!img || !geom || !sctx) return null;
-      const sx = Math.max(0, Math.min(img.naturalWidth - 1, ((cx - geom.ox) / geom.dw) * img.naturalWidth));
-      const sy = Math.max(0, Math.min(img.naturalHeight - 1, ((cy - geom.oy) / geom.dh) * img.naturalHeight));
+      const sx = Math.max(
+        0,
+        Math.min(img.naturalWidth - 1, ((cx - geom.ox) / geom.dw) * img.naturalWidth),
+      );
+      const sy = Math.max(
+        0,
+        Math.min(img.naturalHeight - 1, ((cy - geom.oy) / geom.dh) * img.naturalHeight),
+      );
       sctx.drawImage(img, sx, sy, 1, 1, 0, 0, 1, 1);
       return sctx.getImageData(0, 0, 1, 1).data;
     }
@@ -391,23 +469,29 @@ const pad = (n: number) => String(n).padStart(4, '0');
       return Math.min(1, Math.max(0, -inner.getBoundingClientRect().top / scrollable));
     }
 
-    let cur = 0, prevCur = 0, running = false, needsDraw = true, lastSig = '';
+    let cur = 0,
+      prevCur = 0,
+      running = false,
+      needsDraw = true,
+      lastSig = '';
     let skyTop = null; // captured once: the exterior's opening sky colour, held constant (mobile gradient)
 
     // ---- desktop intro: a SOLID "BRAVURA BUILDERS" logo (fixed & centred, DOM element) rides
     //      over the sky section and down onto the establishing house shot, then fades out as the
     //      camera pans toward the front door. All fade/hold timing is by exterior `local`.
     const heroLogo = document.getElementById('heroLogo');
-    const EST = 0.07;       // establishing hold: full house held, logo solid
+    const EST = 0.07; // establishing hold: full house held, logo solid
     const EST_DRIFT = 0.03; // barely drift through the first few frames during the hold
-    const DOOR = 0.48;      // logo fully faded out (a bit before the front door)
+    const DOOR = 0.48; // logo fully faded out (a bit before the front door)
     let skySampled = false; // once true, --sky-top matches the first frame's sky (seamless seam)
-    let skyArr = null;      // [r,g,b] of that sky, for the canvas-top blend
+    let skyArr = null; // [r,g,b] of that sky, for the canvas-top blend
 
     function render() {
       const maxRoom = N_ROOMS - 1;
       const room = Math.min(maxRoom, Math.max(0, Math.floor(cur)));
-      let local = cur - room; if (local < 0) local = 0; if (local > 1) local = 1;
+      let local = cur - room;
+      if (local < 0) local = 0;
+      if (local > 1) local = 1;
 
       const N = view[room].count;
       // The exterior clip runs out of frames just as the door opens, so the glimpse
@@ -421,15 +505,20 @@ const pad = (n: number) => String(n).padStart(4, '0');
         if (!portrait && local <= EST) {
           ff = (local / EST) * EST_DRIFT * (N - 1);
         } else {
-          const s = portrait ? 0 : EST, d = portrait ? 0 : EST_DRIFT;
+          const s = portrait ? 0 : EST,
+            d = portrait ? 0 : EST_DRIFT;
           const p = (local - s) / (1 - s);
           ff = (d + (1 - d) * p) * (N - 1);
         }
       } else {
         ff = local * (N - 1);
       }
-      let i = Math.floor(ff), f = ff - i;
-      if (i >= N - 1) { i = N - 1; f = 0; }
+      let i = Math.floor(ff),
+        f = ff - i;
+      if (i >= N - 1) {
+        i = N - 1;
+        f = 0;
+      }
 
       const FADE = room === 0 ? 0.9 : 0.82; // hold the living room longer before crossfading
       const nextAlpha = local > FADE && room < maxRoom ? (local - FADE) / (1 - FADE) : 0;
@@ -441,7 +530,10 @@ const pad = (n: number) => String(n).padStart(4, '0');
       loadWindow(room + 1, 0, 1);
       if (local < 0.2 && room > 0) loadWindow(room - 1, view[room - 1].count - 1, -1);
       decodeWindow(room, i, streamDir);
-      if (nextAlpha > 0) { ensure(room + 1, 0); ensure(room + 1, 1); }
+      if (nextAlpha > 0) {
+        ensure(room + 1, 0);
+        ensure(room + 1, 1);
+      }
 
       // desktop intro logo: solid while the establishing shot holds, then fades out ~by the door.
       // (Applied to DOM here, before the canvas early-return, so it tracks scroll every frame.)
@@ -452,25 +544,38 @@ const pad = (n: number) => String(n).padStart(4, '0');
       }
       if (heroLogo) heroLogo.style.opacity = logoOp.toFixed(3);
       if (scrollCue) scrollCue.style.opacity = logoOp.toFixed(3);
-      if (nav) nav.style.opacity = (!portrait && room === 0) ? (1 - logoOp).toFixed(3) : '';
-      if (rail) rail.style.opacity = (!portrait && room === 0) ? (1 - logoOp).toFixed(3) : '';
+      if (nav) nav.style.opacity = !portrait && room === 0 ? (1 - logoOp).toFixed(3) : '';
+      if (rail) rail.style.opacity = !portrait && room === 0 ? (1 - logoOp).toFixed(3) : '';
 
-      const sig = room + ':' + i + ':' + f.toFixed(3) + ':' + nextAlpha.toFixed(3) + ':' + zoom.toFixed(3);
+      const sig =
+        room + ':' + i + ':' + f.toFixed(3) + ':' + nextAlpha.toFixed(3) + ':' + zoom.toFixed(3);
       if (sig === lastSig && !needsDraw) return;
       const base = frameOrNearest(room, i);
-      if (!base) { needsDraw = true; return; } // hold last frame until something loads
-      lastSig = sig; needsDraw = false;
+      if (!base) {
+        needsDraw = true;
+        return;
+      } // hold last frame until something loads
+      lastSig = sig;
+      needsDraw = false;
 
       const fx = view[room].focusX;
       ctx.globalAlpha = 1;
       const baseGeom = drawCover(base, fx, portrait, zoom);
       if (f > 0.001) {
         const nxt = frameOrNearest(room, i + 1);
-        if (nxt) { ctx.globalAlpha = f; drawCover(nxt, fx, portrait, zoom); ctx.globalAlpha = 1; }
+        if (nxt) {
+          ctx.globalAlpha = f;
+          drawCover(nxt, fx, portrait, zoom);
+          ctx.globalAlpha = 1;
+        }
       }
       if (nextAlpha > 0) {
         const nr = frameOrNearest(room + 1, 0);
-        if (nr) { ctx.globalAlpha = nextAlpha; drawCover(nr, view[room + 1].focusX, portrait); ctx.globalAlpha = 1; }
+        if (nr) {
+          ctx.globalAlpha = nextAlpha;
+          drawCover(nr, view[room + 1].focusX, portrait);
+          ctx.globalAlpha = 1;
+        }
       }
       // Sample the establishing frame's top sky pixel once and feed it to the intro gradient's
       // bottom stop (--sky-top), so the seam where the sky panel meets the first frame blends
@@ -480,7 +585,10 @@ const pad = (n: number) => String(n).padStart(4, '0');
         if (sp && sp[3] > 0) {
           skySampled = true;
           skyArr = [sp[0], sp[1], sp[2]];
-          document.documentElement.style.setProperty('--sky-top', `rgb(${sp[0]},${sp[1]},${sp[2]})`);
+          document.documentElement.style.setProperty(
+            '--sky-top',
+            `rgb(${sp[0]},${sp[1]},${sp[2]})`,
+          );
         }
       }
       // Blend the canvas's very top to the flat sky colour (matching the intro panel's bottom) so
@@ -503,7 +611,12 @@ const pad = (n: number) => String(n).padStart(4, '0');
         // Fill the area above the band with a gradient from the theme navy down to the
         // image's top-edge colour, overlapping the join 1px to kill any sub-pixel gap.
         const bandTop = Math.round(canvas.height * (1 - MOBILE_BAND));
-        const s = sampleAt(base, baseGeom, canvas.width >> 1, Math.min(canvas.height - 1, bandTop + 1)) || [0, 0, 0, 0];
+        const s = sampleAt(
+          base,
+          baseGeom,
+          canvas.width >> 1,
+          Math.min(canvas.height - 1, bandTop + 1),
+        ) || [0, 0, 0, 0];
         if (room === 0) {
           // The exterior flies from open sky into the house, so its top-edge colour changes
           // wildly (sky → facade → interior) — a live sample would drift the whole room and a
@@ -553,7 +666,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
     }
 
     function captionOpacity(local, isFirst) {
-      const IN = 0.14, OUT = 0.72;
+      const IN = 0.14,
+        OUT = 0.72;
       if (!isFirst && local < IN) return local / IN; // first room's caption starts visible
       if (local > OUT) return Math.max(0, 1 - (local - OUT) / (1 - OUT));
       return 1;
@@ -561,7 +675,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
     function updateCaptions(room, local, nextAlpha, mo) {
       mo = mo || 0;
       captions.forEach((el, idx) => {
-        let op = 0, y = 24;
+        let op = 0,
+          y = 24;
         if (idx === room) {
           const c = captionOpacity(local, room === 0);
           op = c * (1 - nextAlpha * 0.6) * (1 - mo); // hold room-0 caption until the wordmark clears
@@ -587,32 +702,52 @@ const pad = (n: number) => String(n).padStart(4, '0');
           let ready = 0;
           for (let i = 0; i < need; i++) if (imgs[0][i]) ready++;
           if (loaderFill) loaderFill.style.width = (ready / need) * 100 + '%';
-          if (ready >= need) { done = true; resolve(); } else requestAnimationFrame(check);
+          if (ready >= need) {
+            done = true;
+            resolve();
+          } else requestAnimationFrame(check);
         };
         check();
-        setTimeout(() => { if (!done) { done = true; resolve(); } }, 9000); // safety
+        setTimeout(() => {
+          if (!done) {
+            done = true;
+            resolve();
+          }
+        }, 9000); // safety
       });
       await Promise.all(
-        imgs[0].slice(0, need).filter(Boolean).map((im) => (im.decode ? im.decode().catch(() => {}) : null))
+        imgs[0]
+          .slice(0, need)
+          .filter(Boolean)
+          .map((im) => (im.decode ? im.decode().catch(() => {}) : null)),
       );
-      if (loader) { loader.classList.add('is-done'); setTimeout(() => loader.remove(), 700); }
+      if (loader) {
+        loader.classList.add('is-done');
+        setTimeout(() => loader.remove(), 700);
+      }
       resize();
       // Momentum smooth-scroll: one flick coasts and eases out, so the wheel no
       // longer "brakes" between notches. lerp lower = longer glide.
       const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 1.25, smoothWheel: true });
       window.__lenis = lenis;
-      function lraf(t) { lenis.raf(t); requestAnimationFrame(lraf); }
+      function lraf(t) {
+        lenis.raf(t);
+        requestAnimationFrame(lraf);
+      }
       requestAnimationFrame(lraf);
       running = true;
       requestAnimationFrame(tick);
     }
 
     function onViewportChange() {
-      buildView();  // same frames in both orientations; only the fit (cover/contain) changes
-      resize();     // sets needsDraw
+      buildView(); // same frames in both orientations; only the fit (cover/contain) changes
+      resize(); // sets needsDraw
     }
     let resizeTimer;
-    window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(onViewportChange, 150); });
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(onViewportChange, 150);
+    });
     window.addEventListener('orientationchange', () => setTimeout(onViewportChange, 250));
 
     boot();
@@ -630,47 +765,101 @@ const pad = (n: number) => String(n).padStart(4, '0');
     background: var(--cine-bg);
     transition: opacity 0.6s ease;
   }
-  .loader.is-done { opacity: 0; pointer-events: none; }
-  .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
-  .loader-bar {
-    width: 220px; height: 3px; border-radius: 999px;
-    background: rgba(184, 200, 224, 0.2); overflow: hidden;
+  .loader.is-done {
+    opacity: 0;
+    pointer-events: none;
   }
-  .loader-fill { display: block; height: 100%; width: 0%; background: var(--highlight); transition: width 0.2s ease; }
+  .loader-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .loader-bar {
+    width: 220px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(184, 200, 224, 0.2);
+    overflow: hidden;
+  }
+  .loader-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--highlight);
+    transition: width 0.2s ease;
+  }
   .loader-label {
-    margin: 0; color: rgba(255,255,255,0.6); font-size: 0.8rem;
-    letter-spacing: 0.14em; text-transform: uppercase;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
   /* ---------- Nav ---------- */
   .nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-    display: flex; justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    display: flex;
+    justify-content: center;
     padding: 0.75rem 1rem;
     pointer-events: none;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition:
+      opacity 0.4s ease,
+      transform 0.4s ease;
   }
-  .nav--hidden { opacity: 0; transform: translateY(-12px); }
-  .brand { pointer-events: auto; display: inline-flex; }
-  .brand:hover { text-decoration: none; }
-  .wordmark { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+  .nav--hidden {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  .brand {
+    pointer-events: auto;
+    display: inline-flex;
+  }
+  .brand:hover {
+    text-decoration: none;
+  }
+  .wordmark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+  }
   /* modern, "liquid glass": a bright glassy gradient fill with soft depth */
   .wordmark-name {
     font-family: 'Inter', system-ui, sans-serif;
-    font-weight: 700; font-size: 1.9rem; letter-spacing: 0.16em; text-transform: uppercase;
+    font-weight: 700;
+    font-size: 1.9rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     background: linear-gradient(180deg, #ffffff 0%, #eef4ff 40%, #bccde8 100%);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent;
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4)) drop-shadow(0 3px 14px rgba(0,0,0,0.28));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4)) drop-shadow(0 3px 14px rgba(0, 0, 0, 0.28));
   }
   .wordmark-sub {
-    font-family: 'Inter', sans-serif; font-weight: 500;
-    font-size: 0.62rem; letter-spacing: 0.5em; text-transform: uppercase;
-    color: rgba(224,234,248,0.9); margin: 0.5rem 0 0 0.5em; /* nudge for the tracking */
-    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.62rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: rgba(224, 234, 248, 0.9);
+    margin: 0.5rem 0 0 0.5em; /* nudge for the tracking */
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
   }
-  .wordmark--lg .wordmark-name { font-size: 3rem; }
-  .wordmark--lg .wordmark-sub { font-size: 0.85rem; margin-top: 0.7rem; }
+  .wordmark--lg .wordmark-name {
+    font-size: 3rem;
+  }
+  .wordmark--lg .wordmark-sub {
+    font-size: 0.85rem;
+    margin-top: 0.7rem;
+  }
 
   /* ---------- Intro ---------- */
   .intro {
@@ -680,24 +869,42 @@ const pad = (n: number) => String(n).padStart(4, '0');
     /* Full sky gradient — a little deeper blue at the top (not dark), easing to the first frame's
        ACTUAL sky pixel (--sky-top, sampled from the canvas) and holding it flat over the bottom
        fifth, so the seam where the panel meets the establishing shot is an invisible sky-on-sky blend. */
-    background: linear-gradient(180deg, #b8d5ef 0%, #cfe4f6 42%, var(--sky-top, #dcedfa) 80%, var(--sky-top, #dcedfa) 100%);
+    background: linear-gradient(
+      180deg,
+      #b8d5ef 0%,
+      #cfe4f6 42%,
+      var(--sky-top, #dcedfa) 80%,
+      var(--sky-top, #dcedfa) 100%
+    );
   }
   /* Soft procedural clouds in the upper sky; faded out before the bottom so the seam stays clear. */
   .clouds {
-    position: absolute; inset: 0; width: 100%; height: 100%;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     opacity: 0.82;
-    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, #000 16%, #000 52%, transparent 80%);
-    mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, #000 16%, #000 52%, transparent 80%);
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.6) 0%,
+      #000 16%,
+      #000 52%,
+      transparent 80%
+    );
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, #000 16%, #000 52%, transparent 80%);
   }
   /* The centred wordmark that rides over the sky + establishing shot, then fades.
      Each word clips its own background to its text so they can differ. */
   .hero-logo {
     position: fixed;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     z-index: 30;
-    display: flex; flex-direction: column; align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     line-height: 0.92;
     text-align: center;
     font-family: 'Inter', system-ui, sans-serif; /* sharp, geometric corners */
@@ -706,7 +913,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
     letter-spacing: 0.01em;
     font-size: 16.5vw;
     /* glass sits above the scene: a tight contact shadow + soft ambient for depth */
-    filter: url(#softround) drop-shadow(0 1px 1px rgba(10,25,45,0.4)) drop-shadow(0 10px 22px rgba(10,25,45,0.2));
+    filter: url(#softround) drop-shadow(0 1px 1px rgba(10, 25, 45, 0.4))
+      drop-shadow(0 10px 22px rgba(10, 25, 45, 0.2));
     pointer-events: none;
     will-change: opacity;
   }
@@ -714,77 +922,141 @@ const pad = (n: number) => String(n).padStart(4, '0');
      reflection near the bottom, with a clear translucent body between — so the scene behind
      shows through and tints the letters (adapting as you scroll). No outline, for a clean glass edge. */
   .hero-logo span {
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
   /* BRAVURA — solid white. */
-  .hl-bravura { background: #ffffff; }
+  .hl-bravura {
+    background: #ffffff;
+  }
   /* BUILDERS — solid white. */
-  .hl-builders { background: #ffffff; }
-  :global(html.is-portrait) .hero-logo { display: none; }
+  .hl-builders {
+    background: #ffffff;
+  }
+  :global(html.is-portrait) .hero-logo {
+    display: none;
+  }
   .scroll-cue {
     position: fixed;
-    left: 50%; bottom: 1.8rem;
+    left: 50%;
+    bottom: 1.8rem;
     transform: translateX(-50%);
     z-index: 30;
-    display: inline-flex; flex-direction: column; align-items: center; gap: 0.9rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
     /* sits over the light sky-coloured wordmark panel during the intro, so it's dark for contrast */
-    color: rgba(10,28,42,0.72);
-    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
-    text-shadow: 0 1px 12px rgba(255,255,255,0.4);
+    color: rgba(10, 28, 42, 0.72);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 12px rgba(255, 255, 255, 0.4);
     pointer-events: none;
   }
-  :global(html.is-portrait) .scroll-cue { display: none; }
+  :global(html.is-portrait) .scroll-cue {
+    display: none;
+  }
   .scroll-arrow {
-    width: 1.5px; height: 58px;
-    background: linear-gradient(rgba(10,28,42,0.12), rgba(10,28,42,0.5));
-    position: relative; overflow: hidden; border-radius: 2px;
+    width: 1.5px;
+    height: 58px;
+    background: linear-gradient(rgba(10, 28, 42, 0.12), rgba(10, 28, 42, 0.5));
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
   }
   /* a lit dot travels down the line, "pulling" the eye into the image */
   .scroll-arrow-dot {
-    position: absolute; top: 0; left: 0; width: 100%; height: 45%;
-    background: linear-gradient(rgba(25,79,110,0), var(--accent));
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 45%;
+    background: linear-gradient(rgba(25, 79, 110, 0), var(--accent));
     animation: cue 1.9s cubic-bezier(0.45, 0, 0.2, 1) infinite;
   }
   .scroll-chevron {
-    width: 12px; height: 12px; margin-top: -0.35rem;
+    width: 12px;
+    height: 12px;
+    margin-top: -0.35rem;
     border-right: 1.5px solid var(--accent-deep);
     border-bottom: 1.5px solid var(--accent-deep);
     transform: rotate(45deg);
     animation: chev 1.9s cubic-bezier(0.45, 0, 0.2, 1) infinite;
   }
   @keyframes cue {
-    0% { transform: translateY(-110%); opacity: 0; }
-    35% { opacity: 1; }
-    100% { transform: translateY(230%); opacity: 0; }
+    0% {
+      transform: translateY(-110%);
+      opacity: 0;
+    }
+    35% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(230%);
+      opacity: 0;
+    }
   }
   @keyframes chev {
-    0%, 100% { transform: rotate(45deg) translate(0, 0); opacity: 0.5; }
-    50% { transform: rotate(45deg) translate(3px, 3px); opacity: 1; }
+    0%,
+    100% {
+      transform: rotate(45deg) translate(0, 0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: rotate(45deg) translate(3px, 3px);
+      opacity: 1;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
-    .scroll-arrow-dot, .scroll-chevron { animation: none; }
+    .scroll-arrow-dot,
+    .scroll-chevron {
+      animation: none;
+    }
   }
 
   /* ---------- Journey (scrub) ---------- */
   /* Pulled up 2px so the canvas overlaps the intro's bottom edge — kills the sub-pixel gap that
      would otherwise flash the dark background as a hairline seam during smooth scrolling. */
-  .journey { position: relative; background: var(--cine-bg); margin-top: -2px; }
-  .journey-inner { position: relative; height: 1100vh; } /* weighted: exterior 2×220 + 3 rooms ×220 */
-  .journey-pin {
-    position: sticky; top: 0;
-    height: 100svh; height: 100dvh; /* dvh tracks the viewport as the mobile URL bar hides — no dark strip */
-    width: 100%; overflow: hidden;
+  .journey {
+    position: relative;
+    background: var(--cine-bg);
+    margin-top: -2px;
   }
-  .frame-canvas { display: block; width: 100%; height: 100%; background: var(--cine-bg); }
+  .journey-inner {
+    position: relative;
+    height: 1100vh;
+  } /* weighted: exterior 2×220 + 3 rooms ×220 */
+  .journey-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    height: 100dvh; /* dvh tracks the viewport as the mobile URL bar hides — no dark strip */
+    width: 100%;
+    overflow: hidden;
+  }
+  .frame-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--cine-bg);
+  }
 
   .scrim {
-    position: absolute; inset: 0; pointer-events: none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     /* (Formerly a top sky-fade for the intro→sky seam; the redesigned intro fills the
        canvas from the top with no separate gradient above it, so no scrim is needed.) */
   }
 
-  .caption-layer { position: absolute; inset: 0; pointer-events: none; }
+  .caption-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
   .caption {
     position: absolute;
     left: clamp(1.5rem, 6vw, 6rem);
@@ -796,51 +1068,100 @@ const pad = (n: number) => String(n).padStart(4, '0');
   }
   .caption-kicker {
     display: block;
-    font-size: clamp(0.95rem, 1.5vw, 1.15rem); letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--highlight); margin-bottom: 1rem; font-weight: 600;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--highlight);
+    margin-bottom: 1rem;
+    font-weight: 600;
   }
   .caption-title {
     color: #fff;
     font-size: clamp(2rem, 5.2vw, 3.4rem);
-    line-height: 1.05; margin: 0 0 0.8rem;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 2px 30px rgba(0,0,0,0.45);
+    line-height: 1.05;
+    margin: 0 0 0.8rem;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.55),
+      0 2px 30px rgba(0, 0, 0, 0.45);
   }
   .caption-body {
-    color: rgba(255,255,255,0.86);
+    color: rgba(255, 255, 255, 0.86);
     font-size: clamp(1rem, 1.5vw, 1.15rem);
-    margin: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.6), 0 1px 20px rgba(0,0,0,0.5);
+    margin: 0;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.6),
+      0 1px 20px rgba(0, 0, 0, 0.5);
   }
 
   .progress-rail {
     position: absolute;
     right: clamp(1.1rem, 3vw, 2.5rem);
-    top: 50%; transform: translateY(-50%);
-    display: flex; flex-direction: column; gap: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
   }
   .progress-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(255,255,255,0.28);
-    transition: background 0.3s ease, transform 0.3s ease;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
+    transition:
+      background 0.3s ease,
+      transform 0.3s ease;
   }
-  .progress-dot.is-active { background: var(--highlight); transform: scale(1.5); }
+  .progress-dot.is-active {
+    background: var(--highlight);
+    transform: scale(1.5);
+  }
 
   /* When scrub is active, hide the still fallback. When it's not, hide the canvas journey. */
-  :global(html.has-scrub) .stills { display: none; }
-  :global(html.no-scrub) .journey { display: none; }
-  :global(html:not(.has-scrub):not(.no-scrub)) .stills { display: none; }
+  :global(html.has-scrub) .stills {
+    display: none;
+  }
+  :global(html.no-scrub) .journey {
+    display: none;
+  }
+  :global(html:not(.has-scrub):not(.no-scrub)) .stills {
+    display: none;
+  }
 
   /* ---------- Stills fallback ---------- */
-  .stills { background: var(--cine-bg); padding: 4rem 1.25rem; display: grid; gap: 2rem; }
-  .still { margin: 0; max-width: 1000px; width: 100%; margin-inline: auto; }
+  .stills {
+    background: var(--cine-bg);
+    padding: 4rem 1.25rem;
+    display: grid;
+    gap: 2rem;
+  }
+  .still {
+    margin: 0;
+    max-width: 1000px;
+    width: 100%;
+    margin-inline: auto;
+  }
   .still img {
-    width: 100%; border-radius: 14px; display: block;
-    aspect-ratio: 16 / 9; object-fit: cover;
+    width: 100%;
+    border-radius: 14px;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
   }
-  .still figcaption { display: flex; flex-direction: column; gap: 0.35rem; padding-top: 1rem; color: #fff; }
+  .still figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-top: 1rem;
+    color: #fff;
+  }
   .still figcaption strong {
-    font-family: 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 500;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 500;
   }
-  .still figcaption span:last-child { color: rgba(255,255,255,0.7); }
+  .still figcaption span:last-child {
+    color: rgba(255, 255, 255, 0.7);
+  }
 
   /* ---------- Closing (manifesto + contact) ----------
      Starts at the bedroom floor colour (top) and fades down to the dark theme by
@@ -855,17 +1176,29 @@ const pad = (n: number) => String(n).padStart(4, '0');
     padding: clamp(4rem, 10vw, 7rem) 0;
     background: transparent;
   }
-  .manifesto-inner { max-width: 760px; }
+  .manifesto-inner {
+    max-width: 760px;
+  }
   .dict {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: clamp(1.4rem, 2.6vw, 2rem);
-    line-height: 1.4; color: #fff; margin: 0 0 1.5rem;
+    line-height: 1.4;
+    color: #fff;
+    margin: 0 0 1.5rem;
   }
-  .dict span { color: var(--highlight); font-style: italic; font-size: 0.75em; }
-  .dict em { color: var(--highlight); font-style: italic; }
+  .dict span {
+    color: var(--highlight);
+    font-style: italic;
+    font-size: 0.75em;
+  }
+  .dict em {
+    color: var(--highlight);
+    font-style: italic;
+  }
   .manifesto-body {
-    color: rgba(255,255,255,0.72);
-    font-size: clamp(1.05rem, 1.6vw, 1.2rem); margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+    margin: 0;
   }
 
   /* ---------- Contact ---------- */
@@ -875,71 +1208,146 @@ const pad = (n: number) => String(n).padStart(4, '0');
     padding: clamp(5rem, 10vw, 8rem) 0 clamp(6rem, 12vw, 9rem);
   }
   /* centered, minimal — echoes the top section */
-  .contact-inner { max-width: 640px; margin: 0 auto; text-align: center; }
-  .contact .eyebrow { color: var(--highlight); }
-  .contact h2 { color: #fff; font-size: clamp(2.2rem, 4.5vw, 3.4rem); }
-  .contact p { color: rgba(255,255,255,0.72); max-width: 540px; margin: 0 auto; }
-  .cta-row { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2.5rem; justify-content: center; }
+  .contact-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .contact .eyebrow {
+    color: var(--highlight);
+  }
+  .contact h2 {
+    color: #fff;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  }
+  .contact p {
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 2.5rem;
+    justify-content: center;
+  }
 
   /* liquid-glass CTA buttons (echo the wordmark's glass treatment) */
   .glass-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 0.6rem 1.5rem; border-radius: 999px;
-    font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.85rem;
-    letter-spacing: 0.03em; color: #fff;
-    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.015));
-    border: 1px solid rgba(255,255,255,0.15);
-    -webkit-backdrop-filter: blur(10px) saturate(150%); backdrop-filter: blur(10px) saturate(150%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 3px 12px rgba(0,0,0,0.15);
-    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.5rem;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    backdrop-filter: blur(10px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 3px 12px rgba(0, 0, 0, 0.15);
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease;
   }
   .glass-btn:hover {
-    text-decoration: none; transform: translateY(-1px);
-    background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.1));
-    border-color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transform: translateY(-1px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1));
+    border-color: rgba(255, 255, 255, 0.4);
   }
   .contact-office {
-    margin: 2.75rem 0 0; color: rgba(255,255,255,0.5);
-    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    margin: 2.75rem 0 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   /* ---------- Footer ---------- */
   .foot {
-    padding: 1.75rem 0 2.25rem; color: rgba(255,255,255,0.5); font-size: 0.85rem;
+    padding: 1.75rem 0 2.25rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
     background: var(--cine-bg);
   }
-  .foot-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+  .foot-inner {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 
   @media (max-width: 720px) {
-    .wordmark-name { font-size: 1.55rem; letter-spacing: 0.14em; }
-    .wordmark-sub { font-size: 0.56rem; letter-spacing: 0.44em; }
-    .caption { left: 1.25rem; right: 1.25rem; bottom: 4.5rem; }
+    .wordmark-name {
+      font-size: 1.55rem;
+      letter-spacing: 0.14em;
+    }
+    .wordmark-sub {
+      font-size: 0.56rem;
+      letter-spacing: 0.44em;
+    }
+    .caption {
+      left: 1.25rem;
+      right: 1.25rem;
+      bottom: 4.5rem;
+    }
   }
 
   /* Portrait phones: no separate intro — the image walkthrough IS the top section,
      so the very first scroll moves through the images (image anchored to bottom). */
-  :global(html.is-portrait) .intro { display: none; }
+  :global(html.is-portrait) .intro {
+    display: none;
+  }
   /* mobile draws its own per-room gradient above the band, so hide the CSS scrim */
-  :global(html.is-portrait) .scrim { display: none; }
+  :global(html.is-portrait) .scrim {
+    display: none;
+  }
 
   /* the image band is anchored to the bottom of the screen, so the caption sits
      directly above it and the progress dots move down out of it. */
   :global(html.is-portrait) .caption {
-    left: 1.25rem; right: 1.25rem;
-    top: 0; bottom: var(--band-h, 40vh);
-    display: flex; flex-direction: column; justify-content: center;
+    left: 1.25rem;
+    right: 1.25rem;
+    top: 0;
+    bottom: var(--band-h, 40vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 4.5rem 0 1.6rem; /* clear the logo up top, small gap above the band */
   }
   :global(html.is-portrait) .progress-rail {
-    top: auto; bottom: 1.1rem; left: 0; right: 0; transform: none;
-    flex-direction: row; justify-content: center; gap: 0.55rem;
+    top: auto;
+    bottom: 1.1rem;
+    left: 0;
+    right: 0;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.55rem;
   }
 </style>
 
 <!-- Lenis (momentum smooth-scroll) recommended base styles -->
 <style is:global>
-  html.lenis, html.lenis body { height: auto; }
-  .lenis.lenis-smooth { scroll-behavior: auto !important; }
-  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-  .lenis.lenis-stopped { overflow: hidden; }
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
 </style>
