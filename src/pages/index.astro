@@ -1,12 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const phone = '470-504-3420';
 const phoneHref = 'tel:+14705043420';
 const email = 'nano@bravurabuilders.com';
 const smsHref = 'sms:+14705043420';
 const emailHref = `mailto:${email}`;
-const address = '11720 Amber Park Dr, Alpharetta GA 30009';
 
 // Each room = an image sequence extracted from a wide-angle walkthrough; the
 // camera flies INTO the space as the frame index increases, so scrolling down
@@ -214,7 +212,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
   const WSUM = ROOM_WEIGHTS.reduce((a, b) => a + b, 0);
   const WCUM = []; { let a = 0; for (const w of ROOM_WEIGHTS) { WCUM.push(a); a += w; } }
   function progressToCur(p) {
-    let x = p * WSUM, room = 0;
+    const x = p * WSUM;
+    let room = 0;
     while (room < N_ROOMS - 1 && x >= WCUM[room] + ROOM_WEIGHTS[room]) room++;
     const local = (x - WCUM[room]) / ROOM_WEIGHTS[room];
     return room + Math.max(0, Math.min(1, local));
@@ -392,7 +391,7 @@ const pad = (n: number) => String(n).padStart(4, '0');
       return Math.min(1, Math.max(0, -inner.getBoundingClientRect().top / scrollable));
     }
 
-    let cur = 0, prevCur = 0, running = false, needsDraw = true, lastSig = '', lastT = 0;
+    let cur = 0, prevCur = 0, running = false, needsDraw = true, lastSig = '';
     let skyTop = null; // captured once: the exterior's opening sky colour, held constant (mobile gradient)
 
     // ---- desktop intro: a SOLID "BRAVURA BUILDERS" logo (fixed & centred, DOM element) rides
@@ -407,14 +406,15 @@ const pad = (n: number) => String(n).padStart(4, '0');
 
     function render() {
       const maxRoom = N_ROOMS - 1;
-      let room = Math.min(maxRoom, Math.max(0, Math.floor(cur)));
+      const room = Math.min(maxRoom, Math.max(0, Math.floor(cur)));
       let local = cur - room; if (local < 0) local = 0; if (local > 1) local = 1;
 
       const N = view[room].count;
       // The exterior clip runs out of frames just as the door opens, so the glimpse
       // of the living room is tiny. For that room we decelerate into the door, then
       // hold the last frame and keep pushing in (digital zoom) to extend the reveal.
-      let ff, zoom = 1;
+      let ff;
+      const zoom = 1;
       if (room === 0) {
         // Hold the establishing shot (whole house, barely drifting) while the logo is up, then
         // play straight through the original clip to the door — no digital zoom (it caused lag).
@@ -542,10 +542,8 @@ const pad = (n: number) => String(n).padStart(4, '0');
       updateDots(cur);
     }
 
-    function tick(now) {
+    function tick() {
       if (!running) return;
-      if (!lastT) lastT = now;
-      const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
       // Lenis already smooths the scroll position with momentum, so the canvas
       // tracks it directly (no second easing pass, which would add lag).
       prevCur = cur;
