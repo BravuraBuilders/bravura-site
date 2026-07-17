@@ -1,108 +1,77 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Weighted journey progress (exterior has weight 2 of 5): room midpoints.
-const ROOM_MIDS = [0.2, 0.5, 0.7, 0.9];
+const PAGES = [
+  { path: '/', title: /Bravura Builders/, h1: /Flawless Results/ },
+  { path: '/construction', title: /Construction/, h1: /Priced like a promise/ },
+  { path: '/design', title: /Design/, h1: /yours to keep/i },
+  { path: '/projects', title: /Projects/, h1: /photos and renderings/i },
+  { path: '/about', title: /About/, h1: /Atlanta/ },
+  { path: '/contact', title: /Contact/, h1: /free estimate/i },
+];
 
-// Frame-load noise we tolerate; everything else fails the suite.
-const IGNORED_CONSOLE = [/favicon/i];
-
-function collectErrors(page: Page) {
+function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('console', (m) => {
-    if (m.type() === 'error' && !IGNORED_CONSOLE.some((re) => re.test(m.text())))
-      errors.push(m.text());
+    if (m.type() === 'error') errors.push(m.text());
   });
   page.on('pageerror', (e) => errors.push(e.message));
   return errors;
 }
 
-async function waitForBoot(page: Page) {
+for (const p of PAGES) {
+  test(`${p.path} boots clean with correct heading + landmarks`, async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.goto(p.path);
+    await expect(page).toHaveTitle(p.title);
+    const h1 = page.locator('main h1').first();
+    await expect(h1).toBeVisible();
+    await expect(h1).toContainText(p.h1);
+    await expect(page.locator('header.site-head')).toBeVisible();
+    await expect(page.locator('main#main-content')).toHaveCount(1);
+    await expect(page.locator('footer')).toBeVisible();
+    await expect(page.locator('a.skip-link')).toHaveAttribute('href', '#main-content');
+    expect(errors, errors.join('\n')).toEqual([]);
+  });
+}
+
+test('primary nav links reach every page', async ({ page }) => {
   await page.goto('/');
-  // Loader must remove itself once the boot frames decode (or on the no-scrub path).
-  await page.waitForFunction(() => !document.getElementById('loader'), null, { timeout: 10_000 });
-}
+  for (const label of ['Construction', 'Design', 'Projects', 'About', 'Contact']) {
+    await page.locator('nav.main-nav').getByRole('link', { name: label, exact: true }).click();
+    await expect(page.locator('nav.main-nav a[aria-current="page"]')).toHaveText(label);
+  }
+});
 
-async function scrollToProgress(page: Page, p: number) {
-  await page.evaluate((prog) => {
-    const inner = document.querySelector<HTMLElement>('.journey-inner');
-    if (!inner) return;
-    const scrollable = inner.offsetHeight - window.innerHeight;
-    const y = inner.getBoundingClientRect().top + window.scrollY + prog * scrollable;
-    const lenis = (window as unknown as { __lenis?: { scrollTo: (y: number, o: object) => void } })
-      .__lenis;
-    if (lenis) lenis.scrollTo(y, { immediate: true });
-    else window.scrollTo(0, y);
-  }, p);
-  await page.waitForTimeout(600); // let the rAF loop render + decode
-}
+test('home hero stats count up to real values on scroll', async ({ page }) => {
+  await page.goto('/');
+  const sqft = page.locator('.stat', { hasText: 'FT' }).locator('[data-count]');
+  await expect(sqft).toHaveText('0');
+  await page.mouse.wheel(0, 2200);
+  await expect(sqft).toHaveText('150,000', { timeout: 4000 });
+});
 
-const captionOpacities = (page: Page) =>
-  page.evaluate(() =>
-    [...document.querySelectorAll('.caption')].map((c) => Number(getComputedStyle(c).opacity)),
-  );
+test('projects: filter narrows the grid and lightbox opens + closes', async ({ page }) => {
+  await page.goto('/projects');
+  await expect(page.locator('.proj-grid .card')).toHaveCount(17);
+  await page.getByRole('button', { name: 'Baths' }).click();
+  await expect(page.locator('.proj-grid .card:visible')).toHaveCount(5);
+  await page.getByRole('button', { name: 'All' }).click();
+  await page.locator('.proj-grid .card img').first().click();
+  const lb = page.locator('#lightbox');
+  await expect(lb).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(lb).toBeHidden();
+});
 
-test.describe('scrub journey', () => {
-  test('boots with no console errors and paints the canvas', async ({ page }) => {
-    const errors = collectErrors(page);
-    await waitForBoot(page);
-    await expect(page.locator('html')).toHaveClass(/has-scrub/);
-    await page.waitForTimeout(800);
-    const painted = await page.evaluate(() => {
-      const canvas = document.getElementById('frameCanvas') as HTMLCanvasElement;
-      const ctx = canvas.getContext('2d')!;
-      const { data } = ctx.getImageData(
-        Math.floor(canvas.width / 2),
-        Math.floor(canvas.height * 0.7),
-        1,
-        1,
-      );
-      // navy --cine-bg is (8, 26, 40); a painted frame differs substantially
-      return Math.abs(data[0] - 8) + Math.abs(data[1] - 26) + Math.abs(data[2] - 40) > 30;
-    });
-    expect(painted, 'canvas center should show a frame, not the background').toBe(true);
-    expect(errors).toEqual([]);
-  });
-
-  test('each room shows its caption and progress dot', async ({ page }) => {
-    await waitForBoot(page);
-    for (let room = 0; room < 4; room++) {
-      await scrollToProgress(page, ROOM_MIDS[room]);
-      const ops = await captionOpacities(page);
-      expect(ops[room], `caption ${room} visible at its midpoint`).toBeGreaterThan(0.5);
-      ops.forEach((o, i) => {
-        if (i !== room) expect(o, `caption ${i} hidden at room ${room} midpoint`).toBeLessThan(0.1);
-      });
-      const activeDot = await page.evaluate(() =>
-        [...document.querySelectorAll('.progress-dot')].findIndex((d) =>
-          d.classList.contains('is-active'),
-        ),
-      );
-      expect(activeDot).toBe(room);
-    }
-  });
-
-  test('hero logo holds at the top and clears by the door', async ({ page, viewport }) => {
-    test.skip(viewport!.width < viewport!.height, 'hero logo is desktop-only');
-    await waitForBoot(page);
-    const logoOpacity = () =>
-      page.evaluate(() => Number(getComputedStyle(document.getElementById('heroLogo')!).opacity));
-    expect(await logoOpacity()).toBeGreaterThan(0.9);
-    await scrollToProgress(page, 0.2); // past DOOR (0.48 of room 0 = 0.192 progress)
-    expect(await logoOpacity()).toBeLessThan(0.05);
-  });
-
-  test('portrait mode: band set and first caption visible at scroll 0', async ({
-    page,
-    viewport,
-  }) => {
-    test.skip(viewport!.width >= viewport!.height, 'portrait-only checks');
-    await waitForBoot(page);
-    await expect(page.locator('html')).toHaveClass(/is-portrait/);
-    const bandH = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--band-h'),
-    );
-    expect(bandH.trim()).toMatch(/px$/);
-    const ops = await captionOpacities(page);
-    expect(ops[0], 'first caption visible from scroll 0 on portrait').toBeGreaterThan(0.5);
-  });
+test('contact form: labelled required fields + honeypot present', async ({ page }) => {
+  await page.goto('/contact');
+  for (const id of ['f-name', 'f-phone', 'f-email']) {
+    await expect(page.locator(`#${id}`)).toHaveAttribute('required', '');
+    await expect(page.locator(`label[for="${id}"]`)).toBeVisible();
+  }
+  await expect(page.locator('input[name="access_key"]')).toHaveCount(1);
+  const honeypot = page.locator('input[name="botcheck"]');
+  await expect(honeypot).toHaveCount(1);
+  await expect(honeypot).toHaveAttribute('aria-hidden', 'true');
+  await expect(honeypot).toHaveClass(/hp/);
 });

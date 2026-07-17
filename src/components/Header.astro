@@ -1,0 +1,32 @@
+---
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/construction', label: 'Construction' },
+  { href: '/design', label: 'Design' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+---
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="logo-link" href="/" aria-label="Bravura Builders home">
+      <img src="/img/logo.png" width="415" height="165" alt="Bravura Builders LLC" />
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      {
+        links.map((l) => (
+          <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>
+            {l.label}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="head-cta">
+      <a class="head-phone" href="tel:+14705043420">(470) 504-3420</a>
+      <a class="btn" href="/contact">Get a free estimate</a>
+    </div>
+  </div>
+</header>

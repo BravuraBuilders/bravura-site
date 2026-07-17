@@ -1,31 +1,24 @@
 ---
-// Self-hosted fonts (Fontsource) — no render-blocking Google Fonts CDN fetch.
-// Weights must cover everything global.css and the components use.
+// Self-hosted fonts (Fontsource) — no render-blocking Google Fonts CDN.
+// Blueprint uses Inter across the board (headings at 800, body 400/600).
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
-import '@fontsource/playfair-display/400.css';
-import '@fontsource/playfair-display/500.css';
-import '@fontsource/playfair-display/600.css';
-import '@fontsource/playfair-display/700.css';
-import '@fontsource/playfair-display/400-italic.css';
-import '@fontsource/playfair-display/500-italic.css';
-// Preload the two above-the-fold-critical faces: Inter 700 (hero wordmark),
-// Playfair 500 (caption titles / headings).
-import inter700Url from '@fontsource/inter/files/inter-latin-700-normal.woff2?url';
-import playfair500Url from '@fontsource/playfair-display/files/playfair-display-latin-500-normal.woff2?url';
+import '@fontsource/inter/800.css';
+import inter800Url from '@fontsource/inter/files/inter-latin-800-normal.woff2?url';
+import inter400Url from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
 import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
+  ogImage?: string;
 }
-
-const {
-  title = 'Bravura Builders — Kitchen, Bath & Home Renovations in Metro Atlanta',
-  description = 'Bravura Builders transforms the rooms you use most — kitchens, baths, and laundry rooms — into beautifully constructed spaces. High-craft renovations and new construction across metro Atlanta.',
-} = Astro.props;
+const { title, description, ogImage = '/og.jpg' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 ---
 
 <!doctype html>
@@ -34,18 +27,46 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#16283C" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bravura Builders" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url.href} />
-    <meta property="og:image" content={new URL('/og.jpg', Astro.site ?? Astro.url)} />
-    <link rel="preload" as="font" type="font/woff2" href={inter700Url} crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href={playfair500Url} crossorigin />
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? Astro.url).href} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" as="font" type="font/woff2" href={inter800Url} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={inter400Url} crossorigin />
   </head>
   <body>
-    <slot />
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <Header />
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <div
+      class="lightbox"
+      id="lightbox"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-label="Photo viewer"
+    >
+      <button class="lb-close" type="button" aria-label="Close photo viewer">&times;</button>
+      <button class="lb-nav prev" type="button" aria-label="Previous photo">&lsaquo;</button>
+      <img alt="" />
+      <button class="lb-nav next" type="button" aria-label="Next photo">&rsaquo;</button>
+      <div class="lb-cap"></div>
+    </div>
+
+    <script>
+      import '../scripts/site.js';
+    </script>
   </body>
 </html>

@@ -1,0 +1,119 @@
+---
+import Layout from '../layouts/Layout.astro';
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY || 'REPLACE_WITH_WEB3FORMS_KEY';
+---
+
+<Layout
+  title="Contact — Bravura Builders"
+  description="Get a free construction estimate or start a design engagement. Bravura Builders serves the Atlanta metro. Call (470) 504-3420."
+>
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">Contact</span>
+      <h1>Get your free estimate.</h1>
+      <p class="lede">
+        Send the basics below. We reply by phone, usually the same business day. Prefer to talk now?
+        Call us.
+      </p>
+    </div>
+  </section>
+  <section style="padding-top:0">
+    <div class="wrap contact-grid">
+      <div>
+        <div class="reach rv">
+          <a href="tel:+14705043420"><span class="k">Phone</span>(470) 504-3420</a>
+          <a href="mailto:yossi@bravurabuilders.com"
+            ><span class="k">Email</span>yossi@bravurabuilders.com</a
+          >
+          <div>
+            <span class="k">Office</span><span
+              >11720 Amber Park Dr, Ste 160&nbsp;PMB&nbsp;1157, Alpharetta, GA 30009</span
+            >
+          </div>
+          <div>
+            <span class="k">Service area</span><span>Atlanta metro &middot; Alpharetta</span>
+          </div>
+          <div>
+            <span class="k">Payment terms</span><span
+              >Deposit + milestone progress payments, in writing</span
+            >
+          </div>
+        </div>
+      </div>
+      <form id="inquiry" class="rv" novalidate>
+        <input type="hidden" name="access_key" value={accessKey} />
+        <input type="hidden" name="subject" value="New estimate request — bravurabuilders.com" />
+        <input
+          type="checkbox"
+          name="botcheck"
+          class="hp"
+          tabindex="-1"
+          autocomplete="off"
+          aria-hidden="true"
+        />
+
+        <div class="field">
+          <label for="f-name">Name</label><input
+            id="f-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone</label><input
+            id="f-phone"
+            name="phone"
+            type="tel"
+            autocomplete="tel"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label><input
+            id="f-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="f-type">Project type</label>
+          <select id="f-type" name="type">
+            <option>Residential remodel</option>
+            <option>Commercial renovation</option>
+            <option>Ground-up construction</option>
+            <option>Design only (paid service)</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="f-budget">Budget range</label>
+          <select id="f-budget" name="budget">
+            <option>Under $25k</option>
+            <option>$25k to $75k</option>
+            <option>$75k to $150k</option>
+            <option>$150k to $500k</option>
+            <option>$500k+</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="f-msg">Tell us about the project</label><textarea
+            id="f-msg"
+            name="message"
+            rows="4"></textarea>
+        </div>
+        <div class="form-foot">
+          <button class="btn" type="submit"
+            >Request my estimate <span class="arr">&rarr;</span></button
+          >
+          <p class="form-note">Free for construction. Design engagements are quoted per project.</p>
+        </div>
+        <p class="sent-msg" id="sent-msg" role="status"></p>
+      </form>
+    </div>
+  </section>
+</Layout>
