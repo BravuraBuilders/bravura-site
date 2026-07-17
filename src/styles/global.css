@@ -2,35 +2,40 @@
 
 /* ============ Tokens (inspiration board palette) ============ */
 :root {
-  --paper: #f5f2ea;
-  --paper-2: #ede9dd;
+  --paper: #ffffff;
+  --paper-2: #eef3f9;
   --navy: #16283c;
   --navy-2: #1d3450;
   --navy-3: #0f1d2e;
+  --surface: #d7e6f4;
+  --surface-2: #c8dcef;
+  --surface-3: #e2edf8;
+  --cta-bg: #1e4e86;
+  --cta-bg-hover: #17406e;
   --blue: #bcd5e5;
   --blue-mid: #8fb3cb;
-  --blue-deep: #3e6787;
+  --blue-deep: #1e4e86;
   --ink: #1a2836;
   --ink-soft: #4c5a68;
-  --on-navy: #c9d6e2;
-  --line: #e0dacb;
-  --line-navy: #2a415c;
-  --accent-hover: #d3e5f1;
-  --hero-base-a: #223140;
-  --hero-base-b: #131e29;
-  --warm-a: rgba(216, 172, 116, 0.46);
-  --warm-b: rgba(192, 148, 98, 0.22);
-  --grid-line: rgba(235, 220, 192, 0.07);
-  --grid-line-soft: rgba(188, 213, 229, 0.05);
-  --glow-a: rgba(219, 172, 110, 0.3);
-  --glow-b: rgba(196, 164, 120, 0.14);
-  --line-art: rgba(188, 213, 229, 0.2);
-  --line-art-warm: rgba(216, 172, 116, 0.22);
-  --glass-bg: rgba(29, 52, 80, 0.5);
-  --glass-line: rgba(188, 213, 229, 0.28);
-  --glass-sheen: rgba(228, 204, 168, 0.13);
-  --cta-glow: rgba(62, 103, 135, 0.55);
-  --dark-radial: #24405e;
+  --on-navy: #33475f;
+  --line: #dbe4ee;
+  --line-navy: #c2d5e8;
+  --accent-hover: #cfe0f2;
+  --hero-base-a: #dbe8f6;
+  --hero-base-b: #c7dcef;
+  --warm-a: rgba(120, 165, 215, 0.26);
+  --warm-b: rgba(150, 188, 226, 0.18);
+  --grid-line: rgba(30, 64, 108, 0.07);
+  --grid-line-soft: rgba(30, 64, 108, 0.05);
+  --glow-a: rgba(130, 175, 222, 0.3);
+  --glow-b: rgba(160, 195, 230, 0.16);
+  --line-art: rgba(38, 78, 130, 0.26);
+  --line-art-warm: rgba(38, 78, 130, 0.26);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-line: rgba(255, 255, 255, 0.7);
+  --glass-sheen: rgba(255, 255, 255, 0.5);
+  --cta-glow: rgba(120, 165, 215, 0.4);
+  --dark-radial: #d6e6f4;
   --max: 1240px;
   --gutter: clamp(28px, 6vw, 84px);
   --r: 18px;
@@ -131,7 +136,7 @@ h3 {
 .on-dark h1,
 .on-dark h2,
 .on-dark h3 {
-  color: #fff;
+  color: var(--navy);
 }
 
 .eyebrow {
@@ -156,7 +161,7 @@ h3 {
 }
 
 .on-dark .eyebrow {
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .on-dark .eyebrow::before {
@@ -175,10 +180,10 @@ h3 {
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  background: var(--navy);
+  background: var(--cta-bg);
   color: #fff;
   padding: 16px 30px;
-  border: 1.5px solid var(--navy);
+  border: 1.5px solid var(--cta-bg);
   border-radius: var(--btn-radius);
   transition:
     transform 0.2s cubic-bezier(0.3, 0.7, 0.3, 1.4),
@@ -189,7 +194,7 @@ h3 {
 }
 
 .btn:hover {
-  background: var(--navy-2);
+  background: var(--cta-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(22, 40, 60, 0.22);
 }
@@ -207,14 +212,14 @@ h3 {
 }
 
 .btn.blue {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: var(--navy);
+  background: var(--cta-bg);
+  border-color: var(--cta-bg);
+  color: #fff;
 }
 
 .btn.blue:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  background: var(--cta-bg-hover);
+  border-color: var(--cta-bg-hover);
   box-shadow: 0 12px 30px rgba(22, 40, 60, 0.32);
 }
 
@@ -233,7 +238,7 @@ h3 {
 .on-dark .btn.ghost,
 .cta-box .btn.ghost,
 .hero-dark .btn.ghost {
-  color: #fff;
+  color: var(--navy);
   border-color: rgba(255, 255, 255, 0.38);
 }
 
@@ -250,7 +255,7 @@ h3 {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(245, 242, 234, 0.9);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
   backdrop-filter: blur(16px) saturate(1.15);
   border-bottom: 1px solid var(--line);
@@ -568,7 +573,7 @@ section {
 
 .hero-dark h1 {
   font-size: clamp(38px, 4.9vw, 74px);
-  color: #fff;
+  color: var(--navy);
   margin-bottom: 30px;
   max-width: 15ch;
 }
@@ -596,7 +601,7 @@ section {
 
 .hero-dark h1 em {
   font-style: normal;
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 @keyframes lineup {
@@ -644,13 +649,13 @@ section {
 }
 
 .hero-ctas .btn {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: var(--navy);
+  background: var(--cta-bg);
+  border-color: var(--cta-bg);
+  color: #fff;
 }
 
 .hero-ctas .btn:hover {
-  background: var(--accent-hover);
+  background: var(--cta-bg-hover);
   border-color: var(--accent-hover);
 }
 
@@ -683,20 +688,20 @@ section {
 .definition .word {
   font-size: 26px;
   font-weight: 800;
-  color: #fff;
+  color: var(--navy);
   letter-spacing: 0.01em;
 }
 
 .definition .phon {
   font-family: var(--mono);
   font-size: 13px;
-  color: var(--blue-mid);
+  color: var(--ink-soft);
   margin-left: 10px;
 }
 
 .definition .pos {
   font-style: italic;
-  color: var(--blue-mid);
+  color: var(--ink-soft);
   font-size: 14px;
   margin-left: 6px;
 }
@@ -709,7 +714,7 @@ section {
 }
 
 .definition p u {
-  text-decoration-color: var(--blue);
+  text-decoration-color: var(--blue-deep);
   text-underline-offset: 4px;
 }
 
@@ -717,7 +722,7 @@ section {
   margin-top: 12px;
   font-size: 14.5px;
   font-weight: 600;
-  color: var(--blue);
+  color: var(--blue-deep);
   font-style: italic;
 }
 
@@ -746,7 +751,7 @@ section {
   font-size: clamp(34px, 3.6vw, 54px);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: var(--navy);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
   white-space: nowrap;
@@ -755,7 +760,7 @@ section {
 .stat .num small {
   font-size: 0.5em;
   font-weight: 700;
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .stat .lbl {
@@ -763,7 +768,7 @@ section {
   font-size: 11.5px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--blue-deep);
   margin-top: 10px;
   line-height: 1.7;
 }
@@ -919,7 +924,7 @@ section {
 }
 
 .door.construction {
-  background: linear-gradient(160deg, var(--navy-2), var(--navy-3));
+  background: linear-gradient(160deg, var(--surface-2), var(--surface-3));
   color: var(--on-navy);
 }
 
@@ -955,8 +960,8 @@ section {
 }
 
 .door.construction .badge {
-  background: var(--blue);
-  color: var(--navy);
+  background: var(--navy);
+  color: #fff;
 }
 
 .door.design .badge {
@@ -972,7 +977,7 @@ section {
 }
 
 .door.construction h3 {
-  color: #fff;
+  color: var(--navy);
 }
 
 .door > p {
@@ -1183,7 +1188,7 @@ section {
 
 /* ============ Quotes ============ */
 .quotes {
-  background: var(--navy);
+  background: var(--surface);
   position: relative;
   overflow: hidden;
 }
@@ -1200,7 +1205,7 @@ section {
 }
 
 .quotes .sec-head h2 {
-  color: #fff;
+  color: var(--navy);
 }
 
 .quote-grid {
@@ -1226,12 +1231,12 @@ section {
 .quote .mark {
   font-size: 46px;
   line-height: 0.6;
-  color: var(--blue);
+  color: var(--blue-deep);
   font-weight: 800;
 }
 
 .quote .stars {
-  color: var(--blue);
+  color: var(--blue-deep);
   font-size: 17px;
   letter-spacing: 3px;
   line-height: 1;
@@ -1247,7 +1252,7 @@ section {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--blue-deep);
   margin-top: auto;
 }
 
@@ -1276,14 +1281,14 @@ section {
   gap: 8px;
   font-size: 15.5px;
   font-weight: 700;
-  color: #fff;
+  color: var(--navy);
 }
 
 .review-cta .g b {
   font-family: var(--mono);
   font-weight: 600;
   font-size: 13px;
-  color: var(--blue);
+  color: var(--blue-deep);
 }
 
 .review-cta .who {
@@ -1306,7 +1311,7 @@ section {
 .cta-box {
   background:
     radial-gradient(640px 300px at 85% 0%, var(--cta-glow), transparent 70%),
-    linear-gradient(160deg, var(--navy-2), var(--navy-3));
+    linear-gradient(160deg, var(--surface-2), var(--surface-3));
   border-radius: 24px;
   padding: clamp(42px, 6vw, 76px);
   display: flex;
@@ -1330,7 +1335,7 @@ section {
 }
 
 .cta-box h2 {
-  color: #fff;
+  color: var(--navy);
   font-size: clamp(28px, 3.6vw, 46px);
   max-width: 18ch;
   position: relative;
@@ -1370,7 +1375,7 @@ section {
 .page-hero.dark {
   background:
     radial-gradient(900px 480px at 80% 0%, var(--dark-radial) 0%, transparent 62%),
-    linear-gradient(180deg, var(--navy), var(--navy-3));
+    linear-gradient(180deg, var(--surface), var(--surface-3));
   position: relative;
   overflow: hidden;
 }
@@ -1387,7 +1392,7 @@ section {
 }
 
 .page-hero.dark h1 {
-  color: #fff;
+  color: var(--navy);
   position: relative;
 }
 
@@ -2227,7 +2232,7 @@ textarea {
 
 /* ============ Footer ============ */
 footer {
-  background: var(--navy-3);
+  background: var(--surface-2);
   color: var(--on-navy);
 }
 
@@ -2257,7 +2262,7 @@ footer {
   font-size: 11.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--blue-deep);
   margin-bottom: 16px;
 }
 
@@ -2278,7 +2283,7 @@ footer {
 }
 
 .foot-col a:hover {
-  color: #fff;
+  color: var(--navy);
 }
 
 .foot-base {
@@ -2291,7 +2296,7 @@ footer {
   font-family: var(--mono);
   font-size: 11.5px;
   letter-spacing: 0.08em;
-  color: #7a93ab;
+  color: var(--ink-soft);
 }
 
 @media (max-width: 760px) {
