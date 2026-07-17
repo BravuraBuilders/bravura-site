@@ -19,6 +19,30 @@ interface Props {
 }
 const { title, description, ogImage = '/og.jpg' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+
+// Local-business structured data. Every fact here is confirmed (see CLAUDE.md
+// "Key content facts") — do not add ratings, hours, or service claims without Yossi.
+const businessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'GeneralContractor',
+  name: 'Bravura Builders',
+  slogan: 'Technical Skill, Brilliant Design, Flawless Results.',
+  url: 'https://bravurabuilders.com',
+  logo: 'https://bravurabuilders.com/img/logo.png',
+  image: 'https://bravurabuilders.com/og.jpg',
+  telephone: '+1-470-504-3420',
+  email: 'yossi@bravurabuilders.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '11720 Amber Park Dr, Ste 160 PMB 1157',
+    addressLocality: 'Alpharetta',
+    addressRegion: 'GA',
+    postalCode: '30009',
+    addressCountry: 'US',
+  },
+  areaServed: 'Metro Atlanta, GA',
+  founder: { '@type': 'Person', name: 'Joseph Kievman' },
+};
 ---
 
 <!doctype html>
@@ -41,6 +65,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preload" as="font" type="font/woff2" href={inter800Url} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={inter400Url} crossorigin />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
