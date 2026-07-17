@@ -578,14 +578,16 @@ section {
   max-width: 15ch;
 }
 
-.hero-dark h1 .line {
+.hero-dark h1 .line,
+.page-hero h1 .line {
   display: block;
   overflow: hidden;
   padding-bottom: 0.16em;
   margin-bottom: -0.16em;
 }
 
-.hero-dark h1 .line > span {
+.hero-dark h1 .line > span,
+.page-hero h1 .line > span {
   display: inline-block;
   transform: translateY(120%);
   animation: lineup 1s cubic-bezier(0.16, 0.8, 0.24, 1) forwards;
@@ -853,7 +855,8 @@ section {
     filter: none;
     transition: none;
   }
-  .hero-dark h1 .line > span {
+  .hero-dark h1 .line > span,
+  .page-hero h1 .line > span {
     animation: none;
     transform: none;
   }
