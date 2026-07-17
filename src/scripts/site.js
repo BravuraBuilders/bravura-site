@@ -276,7 +276,7 @@ if (inquiry) {
       const data = await res.json();
       if (data.success) {
         inquiry.reset();
-        msg.textContent = 'Thanks — we’ll call you back within one business day.';
+        msg.textContent = 'Thanks, we’ll call you back within one business day.';
       } else {
         msg.textContent = 'Something went wrong. Please call us at (470) 504-3420.';
       }
