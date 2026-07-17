@@ -1,51 +1,243 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Loader from '../components/Loader.astro';
-import Nav from '../components/Nav.astro';
-import HeroLogo from '../components/HeroLogo.astro';
-import Intro from '../components/Intro.astro';
-import Journey from '../components/Journey.astro';
-import Stills from '../components/Stills.astro';
-import Manifesto from '../components/Manifesto.astro';
-import Contact from '../components/Contact.astro';
-import Footer from '../components/Footer.astro';
-import { rooms } from '../data/rooms';
 ---
 
-<Layout>
-  <Loader />
-  <Nav />
-  <HeroLogo />
-
-  <main>
-    <h1 class="sr-only">Bravura Builders — kitchen, bath &amp; home renovations in metro Atlanta</h1>
-    <Intro />
-    <Journey rooms={rooms} />
-    <Stills rooms={rooms} />
-
-    <!-- CLOSING: light floor colour at the top (blends into the bedroom's bottom)
-         fading down to the dark theme by the page bottom — the mirror of the sky. -->
-    <div class="closing">
-      <Manifesto />
-      <Contact />
+<Layout
+  title="Bravura Builders — Luxury Remodels & Design-Build in Metro Atlanta"
+  description="Bravura Builders runs high-end remodels, commercial renovations, and in-house design across the Atlanta metro. Fixed line-item proposals and free construction estimates."
+>
+  <section class="hero-dark on-dark" aria-label="Introduction">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="glow g1" aria-hidden="true"></div>
+    <div class="glow g2" aria-hidden="true"></div>
+    <svg class="roofline" viewBox="0 0 900 340" aria-hidden="true">
+      <path d="M30,320 V160 L250,42 L470,160 V320"></path>
+      <path class="warm" d="M470,160 H880 M250,42 L320,80 M320,80 V38 H352 V98"></path>
+      <path d="M180,200 h70 v58 h-70 z M215,200 v58 M180,229 h70"></path>
+    </svg>
+    <div class="wrap">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow hero-load"
+            >Luxury remodels &middot; Commercial &middot; Design-build &middot; Atlanta metro</span
+          >
+          <h1>
+            <span class="line"><span>Technical Skill,</span></span>
+            <span class="line"><span><em>Brilliant Design,</em></span></span>
+            <span class="line"><span>Flawless Results.</span></span>
+          </h1>
+          <p class="hero-sub hero-load d1">
+            Bravura Builders runs high-end remodels and commercial renovations with big-city
+            scheduling rigor, priced with the transparency of a fixed, line-item proposal.
+          </p>
+          <div class="hero-ctas hero-load d2">
+            <a class="btn" href="/contact">Get a free estimate <span class="arr">&rarr;</span></a>
+            <a class="btn ghost" href="/design">Start with design</a>
+          </div>
+        </div>
+        <div class="definition hero-load d3">
+          <span class="word">bra&middot;vu&middot;ra</span><span class="phon"
+            >/br&#601;&rsquo;v(y)o&#828;or&#601;/</span
+          ><span class="pos">noun</span>
+          <p>
+            &ldquo;Great technical skill and <u>brilliance</u> shown in a performance or activity.&rdquo;
+          </p>
+          <p class="tagline">Bring bravura to your next remodel.</p>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat hero-load d2">
+          <div class="num"><span data-count="4">0</span> <small>YEARS</small></div><div class="lbl">
+            Senior Project Management, Manhattan Construction
+          </div>
+        </div>
+        <div class="stat hero-load d2">
+          <div class="num"><span data-count="120">0</span><small>+</small></div><div class="lbl">
+            Units renovated, NYC &amp; Atlanta
+          </div>
+        </div>
+        <div class="stat hero-load d3">
+          <div class="num"><span data-count="150000">0</span> <small>FT.&sup2;</small></div><div
+            class="lbl"
+          >
+            Delivered across residential &amp; commercial
+          </div>
+        </div>
+      </div>
     </div>
-  </main>
+    <div class="marquee" aria-hidden="true">
+      <div class="track">
+        <div class="set">
+          <span>Luxury remodels</span><i class="dia"></i>
+          <span>Commercial renovation</span><i class="dia"></i>
+          <span>Ground-up construction</span><i class="dia"></i>
+          <span>In-house design</span><i class="dia"></i>
+          <span>Atlanta metro</span><i class="dia"></i>
+          <span>Licensed &amp; insured</span><i class="dia"></i>
+        </div>
+        <div class="set">
+          <span>Luxury remodels</span><i class="dia"></i>
+          <span>Commercial renovation</span><i class="dia"></i>
+          <span>Ground-up construction</span><i class="dia"></i>
+          <span>In-house design</span><i class="dia"></i>
+          <span>Atlanta metro</span><i class="dia"></i>
+          <span>Licensed &amp; insured</span><i class="dia"></i>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <Footer />
+  <section>
+    <div class="wrap">
+      <div class="doors-head rv">
+        <span class="eyebrow">Two ways to start</span>
+        <h2>Build with us. Or design with us first.</h2>
+        <p>Construction and in-house design are separate doors. Walk through either one.</p>
+      </div>
+      <div class="doors stagger">
+        <div class="door construction rv">
+          <span class="badge">Free estimates</span>
+          <h3>Construction</h3>
+          <p>Full-service general contracting, priced line by line before work begins.</p>
+          <ul>
+            <li>Luxury high-end residential remodels</li>
+            <li>Commercial renovations &amp; build-outs</li>
+            <li>Ground-up construction</li>
+            <li>Pre-construction &amp; estimating</li>
+          </ul>
+          <a class="btn blue" href="/construction"
+            >Explore construction <span class="arr">&rarr;</span></a
+          >
+        </div>
+        <div class="door design rv">
+          <span class="badge">Paid service &middot; A to Z</span>
+          <h3>In-House Design</h3>
+          <p>A complete design package, from first concept to construction-ready documents.</p>
+          <ul>
+            <li>Full design from concept to construction docs</li>
+            <li>3D renderings &amp; style boards</li>
+            <li>Plans &amp; specifications</li>
+            <li>Standalone: take your designs anywhere</li>
+          </ul>
+          <a class="btn" href="/design">Explore design <span class="arr">&rarr;</span></a>
+        </div>
+      </div>
+      <div class="price-note rv">
+        <span class="i" aria-hidden="true">$</span>
+        <span
+          ><b>Clear pricing, no blending:</b> a construction estimate is always free. Design is a paid
+          engagement, even if you don&rsquo;t build with Bravura, and the drawings are yours to keep.</span
+        >
+      </div>
+    </div>
+  </section>
+
+  <section class="featured">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <span class="eyebrow">Featured projects</span>
+          <h2>Finished work, photographed as built.</h2>
+        </div>
+        <a class="btn ghost" href="/projects">See all projects <span class="arr">&rarr;</span></a>
+      </div>
+      <div class="feat-grid stagger">
+        <a class="card big rv" href="/projects"
+          ><img
+            src="/img/projects/DSC07647.jpg"
+            alt="Kitchen remodel with walnut cabinetry, white uppers, and a black stone waterfall island"
+            loading="lazy"
+          /><div class="cap"><b>Walnut &amp; stone kitchen</b><span>Full gut remodel</span></div></a
+        >
+        <a class="card sm rv" href="/projects"
+          ><img
+            src="/img/projects/DSC08124.jpg"
+            alt="Bathroom in black herringbone tile with glass shower"
+            loading="lazy"
+          /><div class="cap"><b>Herringbone bath</b><span>Bath renovation</span></div></a
+        >
+        <a class="card sm rv" href="/projects"
+          ><img
+            src="/img/projects/DSC07609.jpg"
+            alt="Parlor floor with exposed brick fireplace and new oak floors"
+            loading="lazy"
+          /><div class="cap"><b>Parlor floor restoration</b><span>Full floor</span></div></a
+        >
+        <a class="card w1 rv" href="/projects"
+          ><img
+            src="/img/projects/IMG_2920.jpg"
+            alt="Kitchen remodel with rift-oak cabinets and matte black appliances"
+            loading="lazy"
+          /><div class="cap">
+            <b>Rift oak &amp; brass kitchen</b><span>Kitchen remodel</span>
+          </div></a
+        >
+        <a class="card w2 rv" href="/projects"
+          ><img
+            src="/img/projects/DSC07404.jpg"
+            alt="Kitchen renovation with two-tone cabinetry and marble counters"
+            loading="lazy"
+          /><div class="cap"><b>Two-tone kitchen</b><span>Full gut remodel</span></div></a
+        >
+      </div>
+    </div>
+  </section>
+
+  <section class="quotes on-dark">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <span class="eyebrow">Client reviews</span>
+          <h2>What clients say.</h2>
+        </div>
+      </div>
+      <div class="quote-grid stagger">
+        <div class="quote rv">
+          <span class="stars" aria-label="5 out of 5 stars"
+            >&#9733;&#9733;&#9733;&#9733;&#9733;</span
+          ><p>
+            Had a great experience working with Bravura! Highly recommend using them for a
+            professional and easy experience.
+          </p><span class="who">Ariel &middot; Google review</span>
+        </div>
+        <div class="quote rv">
+          <span class="stars" aria-label="5 out of 5 stars"
+            >&#9733;&#9733;&#9733;&#9733;&#9733;</span
+          ><p>Had an amazing experience with Bravura Builders. Highly recommend!!</p><span
+            class="who">Abe &middot; Google review</span
+          >
+        </div>
+        <a
+          class="quote review-cta rv"
+          href="https://g.page/r/CdMEQkwy6YO9EAI/review"
+          target="_blank"
+          rel="noopener"
+          ><span class="stars" aria-label="5 out of 5 stars"
+            >&#9733;&#9733;&#9733;&#9733;&#9733;</span
+          ><span class="g">5.0<b>on Google</b></span><p>
+            Real five-star reviews from Bravura clients. Read them all, or add your own.
+          </p><span class="who">See all reviews <span aria-hidden="true">&rarr;</span></span></a
+        >
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="wrap">
+      <div class="cta-box rv">
+        <div>
+          <h2>Tell us what you&rsquo;re building.</h2>
+          <p>
+            A free, no-obligation estimate for construction, or a design engagement that starts with
+            a conversation.
+          </p>
+        </div>
+        <div class="actions">
+          <a class="btn blue" href="/contact">Get a free estimate <span class="arr">&rarr;</span></a
+          >
+          <a class="btn ghost" href="/contact">Start with design</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>
-
-<script>
-  import { rooms } from '../data/rooms';
-  import { initJourney } from '../lib/journey';
-
-  initJourney(rooms);
-</script>
-
-<style>
-  /* Starts at the bedroom floor colour (top) and fades down to the dark theme by
-     the bottom of the page — the mirror of the sky at the top. The last frame is
-     left crisp; this section carries the blend. */
-  .closing {
-    background: linear-gradient(180deg, #63503b 0%, #63503b 5%, var(--cine-bg) 100%);
-  }
-</style>

@@ -1,200 +1,137 @@
 # Bravura Builders website
 
-Marketing landing page for Bravura Builders — Yossi's general contracting business in Alpharetta, GA. Built with **Astro 5**, deployed via **Cloudflare Pages** to **bravurabuilders.com**.
+Marketing site for Bravura Builders — Yossi's design-build general contracting business in
+Alpharetta / metro Atlanta. Built with **Astro 5**, deployed via **Cloudflare Pages** to
+**bravurabuilders.com**.
+
+> Redesigned 2026-07 ("Blueprint"). The previous site was a single-page scroll-scrubbed
+> image-sequence "Journey"; it has been fully replaced by the multi-page site described below.
+> If you find references to `lib/journey`, `Stills`, `HeroLogo`, room frames, or Lenis, they are
+> stale — that code is gone.
+
+## What the site is
+
+A six-page marketing site with one job: **generate leads** (free construction estimates + paid
+design engagements). Dark, architectural "blueprint" aesthetic — navy, powder blue, warm paper.
+
+```
+/              Home — hero, two-door services, featured work, reviews, CTA
+/construction  Construction services + 4-step process
+/design        In-House Design (paid), renderings, working-model gallery, model→built pairs
+/projects      Filterable portfolio grid (photo groups as sliders) + renderings
+/about         Founder story (Joseph Kievman) + credentials
+/contact       Estimate request form + reach details
+```
 
 ## Repo layout
 
 ```
 src/
-  layouts/Layout.astro          HTML shell, meta/OG tags, Fontsource font imports + preloads
-  pages/index.astro             The page: composes the components + boots the engine (~50 lines)
+  layouts/Layout.astro       HTML shell: meta/OG/canonical, Inter (Fontsource) + preloads,
+                             skip-link, <Header/>, <main>, <Footer/>, the lightbox dialog,
+                             and the one client script.
   components/
-    Loader.astro                Boot loader (logo + progress bar)
-    Nav.astro                   Fixed centered text wordmark
-    HeroLogo.astro              Big solid "BRAVURA BUILDERS" intro logo + scroll cue + #softround filter
-    Intro.astro                 Sky-gradient panel with procedural SVG clouds (desktop only)
-    Journey.astro               The scroll-scrub canvas + captions + progress dots
-    Stills.astro                Reduced-motion / fallback still images
-    Manifesto.astro             "bravura" definition + pitch
-    Contact.astro               Stacked glass CTAs (Call/Text/Email + visible number) + office line
-    Footer.astro
-  data/rooms.ts                 Room data (copy, frame counts, focusX) + canonical contact info
-  lib/journey/                  The scroll-scrub engine (TypeScript)
-    config.ts                   EVERY tuning constant, named + documented — edit feel here
-    scrub-engine.ts             initJourney(): render loop, canvas fitting, gradients, boot
-    frame-store.ts              Bounded lazy load/decode windows for the frame sequences
-    captions.ts                 Caption/dot opacity logic
-    types.ts, index.ts
-  styles/global.css             Brand tokens (CSS vars), base type, wordmark, buttons, Lenis base
+    Header.astro             Sticky glass header; fluid nav that reflows at every width;
+                             sets aria-current from Astro.url.pathname.
+    Footer.astro             Static footer (logo, explore links, contact).
+  pages/*.astro              One file per route; each wraps its sections in <Layout>.
+  scripts/site.js            ALL front-end behavior, guarded by element checks so it is safe
+                             on every page: scroll reveals, scroll-scrubbed stat counters,
+                             hero glow parallax, photo-group sliders, project filters, the
+                             image lightbox (focus-trapped), and the contact-form submit.
+  styles/global.css          The whole design system — CSS-variable tokens + every component
+                             style. Single source of truth for color, type, spacing, shape.
 public/
-  frames/desktop/<room>/frame_NNNN.jpg   Landscape frame sets (exterior, kitchen, bathroom, bedroom)
-  og.jpg, robots.txt, favicon.svg
-tests/                          Playwright smoke suite (see Verification)
-.github/workflows/ci.yml       CI: astro check + eslint + prettier + build + Playwright
+  img/projects/*.jpg         25 real completed-project photos (1600px, q78)
+  img/renders/*.jpg          15 design renderings + working 3D models
+  img/logo.png               Transparent logo lockup
+  favicon.svg, og.jpg, robots.txt
+tests/                       Playwright smoke + reduced-motion specs
+.github/workflows/ci.yml     CI: astro check + eslint + prettier + build + Playwright
 ```
 
-## How the homepage works (the scroll journey)
+## Brand tokens (edit in `src/styles/global.css` `:root`)
 
-The page is a **scroll-scrubbed image-sequence experience** (the Apple-product-page
-technique). Four rooms play in order — **Exterior → Kitchen → Bathroom → Bedroom** — each a
-wide-angle walkthrough exported to every frame. A single sticky `<canvas>` swaps frames as
-you scroll: down flies the camera into the space, up reverses, stopping freezes, and rooms
-crossfade into each other. The exterior flies from the lawn to the front door — the "arrival".
-
-- The engine is `src/lib/journey/` (TypeScript modules; Lenis is the only runtime dep).
-  `index.astro`'s script is just `initJourney(rooms)`.
-- **Frames + fit:** every room uses the `desktop/` (landscape) frames — there are no portrait
-  sets. On landscape the frame fills the screen (`cover`, holding `focusX` at centre). On
-  **portrait phones** (`html.is-portrait`, set in `resize()`): the intro is hidden and the
-  walkthrough IS the top section; the image is cover-cropped into the **bottom half** of the
-  screen (`MOBILE_BAND = 0.5`) with the caption in the top half and dots along the bottom.
-  The first room's caption is visible from scroll 0. The `.journey-pin` is `100dvh` and the
-  canvas fills it, so it tracks the viewport as the mobile URL bar hides/shows — no dark strip.
-  The space above the image is a gradient from `--cine-bg` down to the image's top-edge colour,
-  sampled live in `render()`. **The exterior is a special case:** it holds a CONSTANT sky colour
-  captured at boot and dissolves softly into the image, easing to the live colour + a hard join
-  only as the kitchen cross-dissolves in. (`rooms[].top` is documentary only.)
-- **Exterior intro (desktop):** room 0 holds the establishing shot (barely drifting, `EST`/
-  `EST_DRIFT`) while the hero logo is solid, then plays through to the door; the logo fades out
-  by `DOOR` (0.48 of room 0). No digital zoom (it caused lag — removed). Its crossfade starts
-  later than the interior rooms (`FADE_EXTERIOR = 0.9` vs `FADE_DEFAULT = 0.82`).
-- **Smoothness:** adjacent frames are cross-dissolved by the fractional scroll position.
-  **Momentum scroll** via `lenis` — tune `LENIS_OPTIONS` in `config.ts` (`lerp` lower = longer
-  glide, `wheelMultiplier` higher = more travel per notch). The canvas tracks Lenis directly
-  (no second easing pass — it added lag).
-- **Memory/streaming:** frames load compressed per room on demand in a bounded window
-  (`LOAD_AHEAD/BEHIND`), and only a sliding window around the playhead is kept decoded
-  (`DECODE_AHEAD/BEHIND/PRUNE`) — ~900 frames never blow up RAM. First `BOOT_FRAMES` (18)
-  exterior frames load+decode behind the loader; the rest stream. Failed frames warn once
-  per URL in the console and the engine draws the nearest loaded neighbour.
-- `journey-inner` is `1100vh` (Journey.astro style) — weighted: the exterior gets 2× scroll
-  length (`EXTERIOR_WEIGHT`), interiors 1× each.
-- `prefers-reduced-motion` / no-canvas falls back to `<Stills />` (4 static images).
-  **Keep that fallback working whenever you touch the journey.**
-- **Total frame payload ≈ 60 MB** (908 frames, mozjpeg q70). See "Regenerate the frames".
-
-## Safari lessons (hard-won — do not relearn these)
-
-- **Never `getImageData` the display canvas.** It flips Safari to software rendering for the
-  session and tanks scroll perf. Pixel sampling maps the on-screen point back to the source
-  image and reads a 1×1 offscreen canvas (`sampleAt` in scrub-engine.ts).
-- **JPEG over WebP/AVIF for the frames.** Safari decodes JPEG faster; the decode windows are
-  tuned around JPEG latency. Re-measure decode times before ever switching formats.
-- **Baseline, not progressive JPEG** (mozjpeg defaults to progressive — pass `-baseline`).
-  Progressive decodes slower in Safari.
-- **The exterior set is decimated to every-other frame** (443 → 222) — full-rate caused a
-  room-0 glitch on Safari. The cross-dissolve keeps motion fluid.
-- **Bounded load windows, not whole-room loads** — kicking 400 requests at once saturates the
-  connection so near-playhead frames arrive late (jank).
-- DPR is capped at 1.5 (`DPR_CAP`) to balance sharpness vs decode/GPU load.
-
-## Brand
-
-Tokens live in `src/styles/global.css` (`:root`):
-
-| Token | Value | Where it's used |
+| Token | Value | Use |
 |---|---|---|
-| `--accent` | `#194F6E` (deep teal) | Scroll-cue accents, links |
-| `--accent-deep` | `#062032` (very dark navy) | Scroll chevron |
-| `--accent-dark` | `#0F3A52` | (Available; rarely used) |
-| `--highlight` | `#B8C8E0` (logo blue) | Caption kickers, active dots, eyebrow, loader fill |
-| `--cine-bg` | `#081A28` | Page/theme background (the engine reads this token too) |
-| `--ink` | `#0D1B22` | Base body color (mostly unused on the dark page) |
+| `--paper` / `--paper-2` | `#F5F2EA` / `#EDE9DD` | Light section backgrounds |
+| `--navy` / `--navy-2` / `--navy-3` | `#16283C` / `#1D3450` / `#0F1D2E` | Dark sections, ink, footer |
+| `--blue` | `#BCD5E5` | Powder-blue accent (fills, active nav) |
+| `--blue-deep` | `#3E6787` | Accent text on light (AA-safe) |
+| `--ink` / `--ink-soft` | `#1A2836` / `#4C5A68` | Body text |
+| `--gutter` | `clamp(28px,6vw,84px)` | Page margins (scale with viewport — do not hardcode) |
 
-- Heading font: **Playfair Display**; body font: **Inter** — both **self-hosted via Fontsource**
-  (imported in `Layout.astro`; Inter 700 + Playfair 500 are preloaded). No Google Fonts CDN.
+- Font: **Inter** across the board (headings 800, body 400/600), self-hosted via **Fontsource**
+  (imported + preloaded in `Layout.astro`). No Google Fonts CDN. Playfair is no longer used.
+- Copy rule: **no em/en dashes anywhere** — use periods, commas, or colons. Stats spelled out
+  (e.g. `150,000 ft.²`, not `150K sq ft`).
 
-## Canonical contact info on the site
+## Key content facts (keep accurate — these represent a real business)
 
-Single source of truth: the `contact` export in `src/data/rooms.ts`.
+- Tagline (Yossi-authored, do not change without asking): **"Technical Skill, Brilliant Design,
+  Flawless Results."**
+- Hero stats: `4 years senior project management, Manhattan Construction` · `120+ units
+  renovated` · `150,000 ft.² delivered`. Numbers are real/confirmed.
+- Reviews (Home): two real Google reviews (Ariel, Abe) + a "see all on Google" card. **Never
+  fabricate reviews** — add only real ones Yossi supplies.
+- Contact: phone **470-504-3420** (call + text), email **yossi@bravurabuilders.com**, office
+  **11720 Amber Park Dr, Ste 160 PMB 1157, Alpharetta GA 30009**. Do NOT use the personal cell.
+- Design is sold as a **paid, standalone** service (kept even if the client doesn't build with
+  Bravura) — the pricing distinction (construction estimate = free) must stay clear.
 
-- Phone (call + text): **470-504-3420**
-- Email: **nano@bravurabuilders.com**
-- Address: **11720 Amber Park Dr, Alpharetta GA 30009**
+## Contact form backend
 
-The Contact section shows the number/email inside the stacked glass buttons (action label on
-top, destination below) plus an office-address line.
+The `/contact` form posts to **Web3Forms** (static-friendly, spam-filtered, no server code).
+It reads a public access key from `PUBLIC_WEB3FORMS_KEY` (env). Until that's set, the form shows
+a "not connected yet" notice instead of submitting (see `submit` handler in `src/scripts/site.js`).
+To enable: create a free Web3Forms account for `yossi@bravurabuilders.com`, then set
+`PUBLIC_WEB3FORMS_KEY` in the Cloudflare Pages project env (and `.env` locally). A `botcheck`
+honeypot field is included.
 
-## Edit recipes
+## Front-end behavior notes
 
-### Change room copy (captions) or order
-Edit `rooms` in `src/data/rooms.ts` — each entry has `id`, `desktop` (frame count), optional
-`focusX`, `kicker`, `title`, `body`. Order in the array = order in the journey. `id` must
-match the folder name under `public/frames/desktop/`.
-
-### Tune the scroll feel
-Everything is in `src/lib/journey/config.ts`, named and commented: room hold/fade points,
-caption timing, streaming/decode windows, Lenis momentum, DPR cap. Journey scroll length is
-`height: 1100vh` on `.journey-inner` in `Journey.astro`. After tuning, verify on real Safari.
-
-### Change contact info
-Edit the `contact` export in `src/data/rooms.ts`. Everything on the page reads from it.
-
-### Regenerate / replace the frames (new footage)
-Extract with ffmpeg (landscape 1600w), then compress with mozjpeg (installed via Homebrew):
-```bash
-ffmpeg -y -i walkthrough.mp4 -vf "scale=1600:-2" -vsync 0 -q:v 4 /tmp/frames/frame_%04d.jpg
-for f in /tmp/frames/*.jpg; do
-  /opt/homebrew/opt/mozjpeg/bin/djpeg "$f" \
-  | /opt/homebrew/opt/mozjpeg/bin/cjpeg -quality 70 -baseline -optimize \
-  > "public/frames/desktop/<room>/$(basename "$f")"
-done
-```
-Camera should fly *into* the space (scroll-down advances frames). Set the room's `desktop`
-count in `src/data/rooms.ts` to the new total. If a set is too heavy, decimate to every-other
-frame (the cross-dissolve keeps it smooth). The exterior's opening frames feed the intro seam
-(`--sky-top` sampled live) — verify the intro→frame blend after replacing room 0.
+- `site.js` runs on every page (module script, deferred); every block guards on the elements it
+  needs, so pages without a gallery/form/stats simply skip those blocks.
+- Stat counters **start at 0** and count up tied to scroll position (Yossi's explicit choice);
+  under `prefers-reduced-motion` they render final values immediately.
+- Reveals, slider arrows, counters, and the lightbox all no-op or show final state under reduced
+  motion. Keep that intact.
+- The lightbox is a focus-trapped `role="dialog"`; Escape closes and returns focus.
 
 ## Dev commands
 
 ```bash
 cd ~/Consolidated/Website/bravura-site
-npm install                # first time only
-npm run dev                # local preview at http://localhost:4321
-npm run build              # production build → dist/
-npm run preview            # serve dist/ locally
-npm run check              # astro check (types)
-npm run lint               # eslint
-npm run format             # prettier --write
-npm test                   # Playwright smoke suite (needs a build first)
-npm run verify             # build + test
+npm install
+npm run dev        # http://localhost:4321
+npm run build      # → dist/
+npm run preview    # serve dist/
+npm run check      # astro check (types)
+npm run lint       # eslint
+npm run format     # prettier --write
+npm test           # Playwright (build first)
+npm run verify     # build + test
 ```
 
 ## Verification (run before merging to main)
 
-`tests/smoke.spec.ts` + `tests/reduced-motion.spec.ts` run against chromium (desktop +
-375×812 portrait) and **webkit** (closest CI proxy for Safari): boot without console errors,
-canvas paints, per-room captions/dots at the weighted midpoints, hero-logo fade, portrait
-band + first caption, stills fallback. CI (`.github/workflows/ci.yml`) runs check/lint/
-format/build/tests on every push — it verifies only; Cloudflare Pages owns the deploy.
-For engine changes, ALSO scroll through on real Safari (the perf traps above are
-Safari-specific and Playwright WebKit does not catch all of them) — ideally an iPhone for
-the `dvh`/URL-bar behavior.
+`tests/smoke.spec.ts` (every route boots error-free with the right title/heading + landmarks;
+nav reaches all pages; hero stats count up; projects filter + lightbox; contact form fields) and
+`tests/reduced-motion.spec.ts` run on chromium desktop + portrait and **webkit** (Safari proxy).
+CI runs check/lint/format/build/tests on every push; it verifies only — Cloudflare Pages owns the
+deploy.
 
 ## Deployment
 
-- **Hosting:** Cloudflare Pages (auto-deploys from the main branch of the GitHub repo,
-  `github.com/BravuraBuilders/bravura-site`)
-- **Registrar:** Squarespace (domain points to Cloudflare via DNS — registrar stays at Squarespace)
-- Build command `npm run build`, output dir `dist/`
-
-After ANY `git push` to main, Cloudflare rebuilds + deploys automatically within ~60 seconds.
-No manual step. Work on a branch; merge to main only after `npm run verify` passes.
-
-## Design preferences (things Yossi confirmed during the build)
-
-- **Theme is dark + cinematic.** The page is built around the footage, not a light doc page.
-  `--cine-bg` is the base everywhere; the closing gradient starts at the bedroom floor colour
-  (`#63503b`, in index.astro's `.closing`).
-- Nav is a centered text wordmark (no logo image); it fades out past the journey.
-- The theme is: **turn the spaces you use every day into beautifully constructed spaces.**
-  Copy should stay in that lane.
-- Contact buttons are stacked: action label on top, destination (visible number/email) below.
+- **Hosting:** Cloudflare Pages, auto-deploys from **main** of
+  `github.com/BravuraBuilders/bravura-site`. Build `npm run build`, output `dist/`.
+- **Registrar:** Squarespace (DNS points to Cloudflare).
+- Work on a branch; merge to main only after `npm run verify` passes. Any push to main rebuilds +
+  deploys within ~60s. No manual step.
 
 ## What NOT to invent
 
-- Don't add scope copy or claims that weren't there. This is a marketing page but it represents
-  Yossi's business — keep claims honest. If unsure about wording, ask.
-- The room clips are AI-generated stand-ins for the vibe — treat them as representative, not
-  photos of specific Bravura jobs. Swap in real walkthrough footage as jobs finish.
-- Keep the reduced-motion `<Stills />` fallback intact whenever you touch the journey.
+- Don't add scope claims, stats, or testimonials that Yossi didn't provide. This is his real
+  business. If unsure about wording, ask.
+- Keep the accessibility floor: skip link, labeled fields, visible focus, 44px targets, AA
+  contrast, reduced-motion support. Verify contrast when changing any color token.
