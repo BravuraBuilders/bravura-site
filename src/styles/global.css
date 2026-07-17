@@ -671,7 +671,7 @@ section {
   background: var(--glass-bg);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-line);
+  border: 1px solid var(--blue-deep);
   border-radius: 20px;
   padding: 30px 32px;
   box-shadow: 0 30px 70px rgba(9, 18, 29, 0.45);
@@ -688,9 +688,10 @@ section {
 }
 
 .definition .word {
+  position: relative;
   font-size: 26px;
   font-weight: 800;
-  color: var(--navy);
+  color: var(--blue-deep);
   letter-spacing: 0.01em;
 }
 
