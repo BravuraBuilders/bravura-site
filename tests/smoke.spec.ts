@@ -3,7 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 const PAGES = [
   { path: '/', title: /Bravura Builders/, h1: /Flawless Results/ },
   { path: '/construction', title: /Construction/, h1: /the price you get/i },
-  { path: '/design', title: /Design/, h1: /yours to keep/i },
+  { path: '/design', title: /Design/, h1: /before we build/i },
   { path: '/projects', title: /Projects/, h1: /photos and renderings/i },
   { path: '/about', title: /About/, h1: /Atlanta/ },
   { path: '/contact', title: /Contact/, h1: /free estimate/i },
